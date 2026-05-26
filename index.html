@@ -3,789 +3,637 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>코디맘 - 아이 옷 코디 도우미</title>
+<title>코디맘 - AI 아이 옷 코디</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --pink:#FF8FAB;--pink2:#FFB3C6;--pink3:#FFD6E7;
-  --purple:#C9B8FF;--purple2:#E8E2FF;
+  --pink:#FF8FAB;--pink2:#FFB3C6;--pink3:#FFE4EE;
+  --purple:#C9B8FF;--purple2:#EDE8FF;
   --bg:#FFF5F8;--card:#fff;
-  --text:#2D2030;--muted:#9B8FA0;--light:#C5BAC9;
+  --text:#2A1F2D;--muted:#9B8FA0;--light:#CEC4D2;
   --border:#F0E6EC;
   --r:16px;--r2:12px;--r3:8px;
   --shadow:0 4px 20px rgba(255,143,171,.12);
   --shadow2:0 8px 32px rgba(255,143,171,.2);
   --nav:64px;
 }
-html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:#ecdce8;color:var(--text);-webkit-font-smoothing:antialiased}
+html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:#e8d8e8;color:var(--text);-webkit-font-smoothing:antialiased}
 body{display:flex;justify-content:center;min-height:100vh}
-#app{width:100%;max-width:390px;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.18)}
+#app{width:100%;max-width:390px;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.2)}
 
-/* ── HEADER ── */
-.hdr{position:sticky;top:0;z-index:99;background:rgba(255,245,248,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
-.hdr-logo{font-size:20px;font-weight:700;color:var(--pink);letter-spacing:-.5px}
-.hdr-logo span{color:var(--purple)}
-.hdr-icons{display:flex;gap:10px}
-.hdr-icon{width:34px;height:34px;border-radius:50%;background:var(--pink3);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px}
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:99;background:rgba(255,245,248,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.logo{font-size:20px;font-weight:700;color:var(--pink)}.logo b{color:var(--purple)}
+.hdr-actions{display:flex;gap:8px}
+.icon-btn{width:34px;height:34px;border-radius:50%;background:var(--pink3);border:none;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
 
-/* ── TABS ── */
+/* TABS */
 .content{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--nav)+8px);-webkit-overflow-scrolling:touch}
-.panel{display:none;animation:up .22s ease}
+.panel{display:none;animation:fadeUp .22s ease}
 .panel.on{display:block}
-@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── BOTTOM NAV ── */
-.nav{position:sticky;bottom:0;z-index:99;background:#fff;border-top:1px solid var(--border);height:var(--nav);display:flex;box-shadow:0 -4px 20px rgba(0,0,0,.06)}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--light);transition:color .2s}
-.nav-btn.on{color:var(--pink)}
-.nav-btn svg{width:22px;height:22px}
-.nav-btn span{font-size:10px;font-weight:500}
+/* NAV */
+.nav{position:sticky;bottom:0;z-index:99;background:#fff;border-top:1px solid var(--border);height:var(--nav);display:flex;box-shadow:0 -4px 20px rgba(0,0,0,.05)}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--light);transition:color .2s;font-size:10px;font-weight:500}
+.nb.on{color:var(--pink)}
+.nb svg{width:22px;height:22px}
 
-/* ── HOME ── */
-.home-banner{margin:16px;border-radius:var(--r);background:linear-gradient(135deg,var(--pink) 0%,#ff6b9d 100%);padding:20px;color:#fff;position:relative;overflow:hidden}
-.home-banner::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1)}
-.home-banner h2{font-size:18px;font-weight:700;margin-bottom:4px}
-.home-banner p{font-size:13px;opacity:.85}
-.home-banner .weather-big{font-size:36px;font-weight:300;margin-top:8px}
-.home-banner .city{font-size:12px;opacity:.75;margin-top:2px}
+/* ═══ HOME ═══ */
+.banner{margin:14px;border-radius:var(--r);background:linear-gradient(135deg,#FF8FAB,#C97DCA);padding:20px;color:#fff;overflow:hidden;position:relative}
+.banner::before{content:'';position:absolute;right:-30px;bottom:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08)}
+.banner-date{font-size:11px;opacity:.75;margin-bottom:6px}
+.banner-temp{font-size:42px;font-weight:200;line-height:1}
+.banner-msg{font-size:14px;font-weight:600;margin-top:8px}
+.banner-sub{font-size:12px;opacity:.8;margin-top:2px}
 
-.profile-card{margin:0 16px 16px;background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
-.profile-avatar{width:68px;height:68px;border-radius:50%;object-fit:cover;border:3px solid var(--pink3);flex-shrink:0}
-.profile-avatar-err{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--pink3),var(--purple2));display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
-.profile-info h3{font-size:15px;font-weight:700;margin-bottom:2px}
-.profile-info p{font-size:12px;color:var(--muted)}
-.profile-badge{display:inline-block;margin-top:5px;padding:3px 9px;background:var(--pink3);border-radius:20px;font-size:11px;color:var(--pink);font-weight:600}
+.profile-card{margin:0 14px 14px;background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
+.child-photo{width:70px;height:70px;border-radius:50%;object-fit:cover;border:3px solid var(--pink3);flex-shrink:0;background:var(--pink3)}
+.child-fallback{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--pink3),var(--purple2));display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}
+.p-name{font-size:16px;font-weight:700}
+.p-info{font-size:12px;color:var(--muted);margin-top:2px}
+.p-badge{display:inline-block;margin-top:6px;padding:3px 10px;background:var(--pink3);border-radius:20px;font-size:11px;color:var(--pink);font-weight:600}
 
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 16px 16px}
-.stat-box{background:var(--card);border-radius:var(--r2);padding:12px;text-align:center;box-shadow:var(--shadow)}
-.stat-box .num{font-size:22px;font-weight:700;color:var(--pink)}
-.stat-box .lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 14px 14px}
+.stat{background:var(--card);border-radius:var(--r2);padding:14px;text-align:center;box-shadow:var(--shadow)}
+.stat-n{font-size:24px;font-weight:700;color:var(--pink)}
+.stat-l{font-size:11px;color:var(--muted);margin-top:2px}
 
-.weather-row{display:flex;gap:10px;margin:0 16px 16px}
-.weather-card{flex:1;background:var(--card);border-radius:var(--r2);padding:12px;box-shadow:var(--shadow);text-align:center}
-.weather-card .day{font-size:11px;color:var(--muted);margin-bottom:4px}
-.weather-card .temp{font-size:20px;font-weight:700;color:var(--text)}
-.weather-card .desc{font-size:11px;color:var(--muted);margin-top:2px}
-.weather-card .icon{font-size:24px;margin-bottom:4px}
+.weather-strip{display:flex;gap:8px;margin:0 14px 14px;overflow-x:auto;scrollbar-width:none}
+.weather-strip::-webkit-scrollbar{display:none}
+.wc{flex-shrink:0;width:80px;background:var(--card);border-radius:var(--r2);padding:10px 8px;box-shadow:var(--shadow);text-align:center}
+.wc-icon{font-size:22px}
+.wc-day{font-size:10px;color:var(--muted);margin:3px 0}
+.wc-temp{font-size:16px;font-weight:700}
+.wc-desc{font-size:9px;color:var(--muted);margin-top:2px}
 
-.cta-btn{display:block;margin:0 16px 24px;padding:16px;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:700;text-align:center;cursor:pointer;letter-spacing:.3px;box-shadow:0 6px 20px rgba(255,143,171,.4);transition:transform .15s,box-shadow .15s}
-.cta-btn:active{transform:scale(.97);box-shadow:0 2px 10px rgba(255,143,171,.3)}
+.cta{display:block;margin:0 14px 24px;padding:16px;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 6px 22px rgba(255,143,171,.4);transition:transform .15s}
+.cta:active{transform:scale(.97)}
 
-/* ── WARDROBE ── */
-.sec-header{padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between}
+/* ═══ WARDROBE ═══ */
+.sec-hdr{padding:16px 14px 8px;display:flex;align-items:center;justify-content:space-between}
 .sec-title{font-size:16px;font-weight:700}
-.sec-sub{font-size:12px;color:var(--muted)}
+.sec-cnt{font-size:12px;color:var(--muted)}
 
-.filter-row{display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
-.filter-row::-webkit-scrollbar{display:none}
-.filter-pill{padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
-.filter-pill.on{background:var(--pink);border-color:var(--pink);color:#fff}
+.filters{display:flex;gap:8px;padding:0 14px 12px;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fp{padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.fp.on{background:var(--pink);border-color:var(--pink);color:#fff}
 
-.clothes-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 12px}
-.cloth-card{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;position:relative;transition:transform .15s,box-shadow .15s}
-.cloth-card:active{transform:scale(.97)}
-.cloth-card.selected{outline:3px solid var(--pink);outline-offset:0px}
-.cloth-card.selected::after{content:'✓';position:absolute;top:8px;right:8px;width:24px;height:24px;background:var(--pink);border-radius:50%;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:2}
-.cloth-card.dirty{opacity:.6}
-.cloth-img-wrap{width:100%;aspect-ratio:1;overflow:hidden;background:#f7f2f5;position:relative}
-.cloth-img{width:100%;height:100%;object-fit:cover;display:block}
-.cloth-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;background:linear-gradient(135deg,var(--pink3),var(--purple2))}
-.cloth-info{padding:10px 10px 8px}
-.cloth-name{font-size:13px;font-weight:600;margin-bottom:4px}
-.cloth-meta{display:flex;align-items:center;justify-content:space-between}
-.cloth-cat{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--pink3);color:var(--pink);font-weight:600}
-.cloth-laundry{font-size:16px;cursor:pointer;background:none;border:none;padding:0;line-height:1}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 14px 80px}
+.cc{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;position:relative;transition:transform .12s}
+.cc:active{transform:scale(.96)}
+.cc.sel{outline:3px solid var(--pink)}
+.cc.sel::after{content:'✓';position:absolute;top:8px;right:8px;width:26px;height:26px;background:var(--pink);border-radius:50%;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:2}
+.cc.dirty{opacity:.55}
+.cc-img-wrap{width:100%;aspect-ratio:1;background:#f5eff5;overflow:hidden;position:relative}
+.cc-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.cc:hover .cc-img{transform:scale(1.04)}
+.cc-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:52px}
+.cc-body{padding:10px}
+.cc-name{font-size:13px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-row{display:flex;align-items:center;justify-content:space-between}
+.cc-cat{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--pink3);color:var(--pink);font-weight:600}
+.cc-wash{background:none;border:none;font-size:16px;cursor:pointer;padding:0;line-height:1}
 
-.select-bar{position:fixed;bottom:calc(var(--nav));left:50%;transform:translateX(-50%);width:calc(min(390px,100%));background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;z-index:50;box-shadow:0 -4px 20px rgba(255,143,171,.3);animation:slideup .2s ease}
-@keyframes slideup{from{transform:translateX(-50%) translateY(100%)}to{transform:translateX(-50%) translateY(0)}}
-.select-bar.hidden{display:none}
-.select-bar-txt{font-size:14px;font-weight:600}
-.select-bar-btn{background:#fff;color:var(--pink);border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer}
+.sel-bar{position:fixed;bottom:var(--nav);left:50%;transform:translateX(-50%);width:min(390px,100%);background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;z-index:60;box-shadow:0 -4px 20px rgba(255,143,171,.3);transition:transform .2s}
+.sel-bar.hidden{transform:translateX(-50%) translateY(100%)}
+.sel-bar-txt{font-size:14px;font-weight:600}
+.sel-bar-btn{background:#fff;color:var(--pink);border:none;border-radius:20px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer}
 
-.fab{position:fixed;bottom:calc(var(--nav) + 16px);right:calc(50% - 195px + 16px);width:48px;height:48px;border-radius:50%;background:var(--pink);color:#fff;border:none;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(255,143,171,.4);display:flex;align-items:center;justify-content:center;z-index:40;transition:transform .15s}
+.fab{position:fixed;bottom:calc(var(--nav) + 16px);right:calc(50% - min(390px,100%)/2 + 16px);width:50px;height:50px;border-radius:50%;background:var(--pink);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 18px rgba(255,143,171,.45);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .fab:active{transform:scale(.9)}
 .fab.hidden{display:none}
 
-/* ── SIMULATION ── */
-.sim-container{padding:0 16px 16px}
+/* ═══ SIMULATION ═══ */
+.sim-wrap{padding:0 14px 20px}
 
-.sim-canvas-wrap{position:relative;width:100%;border-radius:var(--r);overflow:hidden;background:#f0e8f0;box-shadow:var(--shadow2)}
-.sim-child-img{width:100%;display:block;object-fit:cover;transition:opacity .3s}
-.sim-child-placeholder{width:100%;aspect-ratio:2/3;display:flex;align-items:center;justify-content:center}
+/* 메인 시뮬레이션 뷰 */
+.sim-view{border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow2);position:relative;background:#f0e8f0}
 
-/* Clothing overlays on child photo */
-.overlay-zone{position:absolute;pointer-events:none;transition:opacity .35s}
-.overlay-zone img{width:100%;height:100%;object-fit:cover;border-radius:8px;opacity:.88;mix-blend-mode:multiply}
-.overlay-zone.hidden{opacity:0}
-.overlay-zone.visible{opacity:1}
+/* 아이 사진 */
+.sim-base{width:100%;aspect-ratio:2/3;object-fit:cover;display:block}
 
-/* zone positions (% of container) */
-.zone-accessory{top:2%;left:28%;width:44%;height:17%}
-.zone-outer   {top:19%;left:5%; width:90%;height:42%}
-.zone-top     {top:22%;left:14%;width:72%;height:34%}
-.zone-dress   {top:19%;left:8%; width:84%;height:60%}
-.zone-bottom  {top:53%;left:18%;width:64%;height:30%}
-.zone-shoes   {top:81%;left:15%;width:70%;height:18%}
+/* AI 처리 중 오버레이 */
+.sim-loading{position:absolute;inset:0;background:rgba(255,245,248,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:10;border-radius:var(--r);opacity:0;pointer-events:none;transition:opacity .3s}
+.sim-loading.on{opacity:1;pointer-events:auto}
+.spinner{width:48px;height:48px;border:4px solid var(--pink3);border-top-color:var(--pink);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:14px;font-weight:600;color:var(--pink)}
+.loading-sub{font-size:12px;color:var(--muted)}
 
-.sim-shimmer{position:absolute;inset:0;background:linear-gradient(90deg,transparent 25%,rgba(255,255,255,.6) 50%,transparent 75%);background-size:200% 100%;animation:shimmer .9s infinite;opacity:0;transition:opacity .2s;border-radius:var(--r);z-index:3}
-.sim-shimmer.on{opacity:1}
-@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+/* AI 결과 사진 */
+.sim-result{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .5s;z-index:5}
+.sim-result.on{opacity:1;pointer-events:auto}
+.sim-result img{width:100%;height:100%;object-fit:cover}
 
-.sim-outfit-label{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-radius:var(--r2);padding:10px 14px;display:flex;align-items:center;gap:8px}
-.ai-badge{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;white-space:nowrap}
-.outfit-name{font-size:13px;font-weight:600;color:var(--text)}
+/* 결과 없을 때 placeholder */
+.sim-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--pink3),var(--purple2))}
+.sim-placeholder-icon{font-size:64px}
+.sim-placeholder-txt{font-size:14px;color:var(--muted);font-weight:500;text-align:center;padding:0 20px}
 
-.sim-chips{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0 4px}
-.sim-chip{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;transition:all .15s}
-.sim-chip img{width:24px;height:24px;object-fit:cover;border-radius:6px}
-.sim-chip .x{color:var(--muted);font-size:14px;margin-left:2px}
-.sim-chip:hover{border-color:var(--pink);color:var(--pink)}
-.sim-empty{padding:16px 0;text-align:center;color:var(--muted);font-size:13px}
+/* 결과 라벨 */
+.sim-badge{position:absolute;top:12px;left:12px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;z-index:6}
 
-.sim-actions{display:flex;gap:10px;padding:8px 0 16px}
-.sim-btn{flex:1;padding:12px;border-radius:var(--r2);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none}
-.sim-btn.primary{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 4px 14px rgba(255,143,171,.35)}
-.sim-btn.secondary{background:var(--card);color:var(--pink);border:1.5px solid var(--pink3)}
+/* 선택된 옷 칩 */
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0 8px}
+.chip{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;transition:all .15s;max-width:160px}
+.chip img{width:26px;height:26px;object-fit:cover;border-radius:6px;flex-shrink:0}
+.chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-x{color:var(--muted);margin-left:2px;flex-shrink:0}
+.chip:hover{border-color:var(--pink);color:var(--pink)}
+.no-selection{padding:14px 0;color:var(--muted);font-size:13px;text-align:center}
+
+/* 버튼들 */
+.sim-btns{display:flex;gap:10px;padding:4px 0 16px}
+.sim-btn{flex:1;padding:13px;border-radius:var(--r2);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.sim-btn.prim{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 4px 16px rgba(255,143,171,.35)}
+.sim-btn.sec{background:var(--card);color:var(--pink);border:1.5px solid var(--pink3)}
 .sim-btn:active{transform:scale(.97)}
 
-/* influencer cards */
-.inf-section{margin-top:8px}
-.inf-title{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.inf-scroll{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
-.inf-scroll::-webkit-scrollbar{display:none}
-.inf-card{flex-shrink:0;width:140px;border-radius:var(--r2);overflow:hidden;background:var(--card);box-shadow:var(--shadow);cursor:pointer}
-.inf-card img{width:100%;height:180px;object-fit:cover;display:block}
-.inf-card-info{padding:8px 10px}
-.inf-card-name{font-size:12px;font-weight:600}
-.inf-card-tag{font-size:10px;color:var(--muted)}
+/* API 키 안내 배너 */
+.api-notice{background:linear-gradient(135deg,#fff8dc,#fffde7);border:1.5px solid #ffc107;border-radius:var(--r2);padding:14px;margin-bottom:14px;font-size:12px;color:#795548;line-height:1.6}
+.api-notice b{color:#e65100}
 
-/* ── STYLE FEED ── */
-.feed-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 16px}
-.feed-card{border-radius:var(--r);overflow:hidden;background:var(--card);box-shadow:var(--shadow);cursor:pointer;position:relative}
-.feed-card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
-.feed-card-info{padding:10px}
-.feed-card-title{font-size:12px;font-weight:600;margin-bottom:4px}
-.feed-card-tags{display:flex;flex-wrap:wrap;gap:4px}
-.feed-tag{font-size:10px;padding:2px 7px;background:var(--pink3);border-radius:10px;color:var(--pink)}
-.feed-heart{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.85);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
-.feed-heart.liked{animation:heartpop .3s ease}
+/* 참고 피드 */
+.ref-title{font-size:14px;font-weight:700;margin-bottom:10px}
+.ref-scroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.ref-scroll::-webkit-scrollbar{display:none}
+.ref-card{flex-shrink:0;width:130px;border-radius:var(--r2);overflow:hidden;background:var(--card);box-shadow:var(--shadow);cursor:pointer}
+.ref-card img{width:100%;height:165px;object-fit:cover;display:block}
+.ref-card-body{padding:8px}
+.ref-card-name{font-size:11px;font-weight:600}
+.ref-card-tag{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* ═══ FEED ═══ */
+.feed-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 14px 14px}
+.fc{border-radius:var(--r);overflow:hidden;background:var(--card);box-shadow:var(--shadow);cursor:pointer;position:relative}
+.fc img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.fc-info{padding:10px}
+.fc-title{font-size:12px;font-weight:600;margin-bottom:5px}
+.fc-tags{display:flex;flex-wrap:wrap;gap:4px}
+.fc-tag{font-size:10px;padding:2px 7px;background:var(--pink3);border-radius:10px;color:var(--pink)}
+.heart-btn{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.88);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.heart-btn.liked{animation:heartpop .3s ease}
 @keyframes heartpop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
-.feed-apply{display:block;width:calc(100% - 20px);margin:6px 10px 10px;padding:8px;background:var(--pink);border:none;border-radius:var(--r3);color:#fff;font-size:12px;font-weight:600;cursor:pointer}
-
-/* ── EMPTY / MISC ── */
-.section-gap{height:16px}
+.apply-btn{display:block;width:calc(100% - 20px);margin:4px 10px 10px;padding:8px;background:var(--pink);border:none;border-radius:var(--r3);color:#fff;font-size:11px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- HEADER -->
   <div class="hdr">
-    <div class="hdr-logo">코디<span>맘</span> 👗</div>
-    <div class="hdr-icons">
-      <button class="hdr-icon" onclick="alert('알림이 없습니다.')">🔔</button>
-      <button class="hdr-icon" onclick="alert('설정')">⚙️</button>
+    <div class="logo">코디<b>맘</b> 👗</div>
+    <div class="hdr-actions">
+      <button class="icon-btn">🔔</button>
+      <button class="icon-btn">⚙️</button>
     </div>
   </div>
 
-  <!-- CONTENT -->
-  <div class="content" id="content">
+  <div class="content">
 
-    <!-- ── TAB 1: HOME ── -->
+    <!-- ═══ HOME ═══ -->
     <div class="panel on" id="tab-home">
-      <div class="home-banner">
-        <div class="city">📍 서울특별시</div>
-        <div class="weather-big">22°C ⛅</div>
-        <h2 id="greeting">안녕하세요! 오늘도 예쁘게 입혀봐요 💕</h2>
-        <p id="today-date">2026년 5월 26일 월요일</p>
+      <div class="banner">
+        <div class="banner-date" id="banner-date">2026년 5월 26일 월요일</div>
+        <div class="banner-temp">22°C ⛅</div>
+        <div class="banner-msg" id="banner-msg">좋은 오후예요! 오늘도 예쁘게 입혀봐요 💕</div>
+        <div class="banner-sub">서울특별시 · 구름 조금</div>
       </div>
 
       <div class="profile-card">
-        <img class="profile-avatar"
-          src="https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?w=140&h=140&fit=crop&q=80"
+        <img class="child-photo"
+          src="https://images.unsplash.com/photo-1609823056967-e56294bf6921?w=140&h=140&fit=crop&q=80"
           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
           alt="지아">
-        <div class="profile-avatar-err" style="display:none">👧</div>
-        <div class="profile-info">
-          <h3>김지아</h3>
-          <p>여아 · 만 3세 · 95cm · 14kg</p>
-          <div class="profile-badge">Size 100</div>
+        <div class="child-fallback" style="display:none">👧</div>
+        <div>
+          <div class="p-name">김지아</div>
+          <div class="p-info">여아 · 만 3세 · 95cm · 14kg</div>
+          <div class="p-badge">Size 100</div>
         </div>
       </div>
 
-      <div class="stats-row">
-        <div class="stat-box"><div class="num" id="stat-total">12</div><div class="lbl">전체 옷</div></div>
-        <div class="stat-box"><div class="num" id="stat-clean">9</div><div class="lbl">깨끗한 옷</div></div>
-        <div class="stat-box"><div class="num" id="stat-sim">5</div><div class="lbl">코디 추천</div></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-n" id="s-total">12</div><div class="stat-l">전체 옷</div></div>
+        <div class="stat"><div class="stat-n" id="s-clean">9</div><div class="stat-l">깨끗한 옷</div></div>
+        <div class="stat"><div class="stat-n">AI</div><div class="stat-l">가상 피팅</div></div>
       </div>
 
-      <div class="weather-row">
-        <div class="weather-card">
-          <div class="icon">⛅</div>
-          <div class="day">오늘</div>
-          <div class="temp">22°C</div>
-          <div class="desc">구름 조금</div>
-        </div>
-        <div class="weather-card">
-          <div class="icon">☀️</div>
-          <div class="day">내일</div>
-          <div class="temp">26°C</div>
-          <div class="desc">맑음</div>
-        </div>
-        <div class="weather-card">
-          <div class="icon">🌧️</div>
-          <div class="day">모레</div>
-          <div class="temp">18°C</div>
-          <div class="desc">비</div>
-        </div>
+      <div class="weather-strip">
+        <div class="wc"><div class="wc-icon">⛅</div><div class="wc-day">오늘</div><div class="wc-temp">22°</div><div class="wc-desc">구름조금</div></div>
+        <div class="wc"><div class="wc-icon">☀️</div><div class="wc-day">내일</div><div class="wc-temp">26°</div><div class="wc-desc">맑음</div></div>
+        <div class="wc"><div class="wc-icon">🌧️</div><div class="wc-day">모레</div><div class="wc-temp">18°</div><div class="wc-desc">비</div></div>
+        <div class="wc"><div class="wc-icon">⛅</div><div class="wc-day">3일후</div><div class="wc-temp">21°</div><div class="wc-desc">흐림</div></div>
+        <div class="wc"><div class="wc-icon">☀️</div><div class="wc-day">4일후</div><div class="wc-temp">24°</div><div class="wc-desc">맑음</div></div>
       </div>
 
-      <button class="cta-btn" onclick="goTab('sim');autoRecommend()">
-        ✨ 오늘의 코디 추천받기
-      </button>
+      <button class="cta" onclick="goTab('sim')">✨ AI 가상 피팅 시작하기</button>
     </div>
 
-    <!-- ── TAB 2: WARDROBE ── -->
+    <!-- ═══ WARDROBE ═══ -->
     <div class="panel" id="tab-wardrobe">
-      <div class="sec-header">
-        <div class="sec-title">👚 우리 아이 옷장</div>
-        <div class="sec-sub" id="wardrobe-count">12벌</div>
+      <div class="sec-hdr">
+        <div class="sec-title">👚 옷장</div>
+        <div class="sec-cnt" id="wrd-cnt">12벌</div>
       </div>
-
-      <div class="filter-row" id="filter-row">
-        <button class="filter-pill on" data-cat="전체" onclick="filterClothes(this)">전체</button>
-        <button class="filter-pill" data-cat="상의" onclick="filterClothes(this)">상의</button>
-        <button class="filter-pill" data-cat="하의" onclick="filterClothes(this)">하의</button>
-        <button class="filter-pill" data-cat="원피스" onclick="filterClothes(this)">원피스</button>
-        <button class="filter-pill" data-cat="아우터" onclick="filterClothes(this)">아우터</button>
-        <button class="filter-pill" data-cat="신발" onclick="filterClothes(this)">신발</button>
-        <button class="filter-pill" data-cat="액세서리" onclick="filterClothes(this)">액세서리</button>
+      <div class="filters" id="cat-filters">
+        <button class="fp on" data-cat="전체" onclick="filterCat(this)">전체</button>
+        <button class="fp" data-cat="상의" onclick="filterCat(this)">상의</button>
+        <button class="fp" data-cat="하의" onclick="filterCat(this)">하의</button>
+        <button class="fp" data-cat="원피스" onclick="filterCat(this)">원피스</button>
+        <button class="fp" data-cat="아우터" onclick="filterCat(this)">아우터</button>
+        <button class="fp" data-cat="신발" onclick="filterCat(this)">신발</button>
+        <button class="fp" data-cat="액세서리" onclick="filterCat(this)">액세서리</button>
       </div>
-
-      <div class="clothes-grid" id="clothes-grid"></div>
-      <div class="section-gap"></div>
+      <div class="grid" id="cloth-grid"></div>
     </div>
 
-    <!-- ── TAB 3: SIMULATION ── -->
+    <!-- ═══ SIMULATION ═══ -->
     <div class="panel" id="tab-sim">
-      <div class="sec-header">
-        <div class="sec-title">👗 코디 시뮬레이션</div>
-        <div class="sec-sub">⛅ 오늘 서울 22°C</div>
+      <div class="sec-hdr">
+        <div class="sec-title">🤖 AI 가상 피팅</div>
+        <div class="sec-cnt">선택한 옷을 입혀드려요</div>
       </div>
 
-      <div class="sim-container">
+      <div class="sim-wrap">
 
-        <!-- 아이 사진 + 옷 오버레이 -->
-        <div class="sim-canvas-wrap" id="simWrap" style="aspect-ratio:2/3">
-          <!-- 기본 아이 사진 (베이스 레이어) -->
-          <img class="sim-child-img" id="simChildImg"
+        <!-- API 키 안내 -->
+        <div class="api-notice" id="apiNotice">
+          🔑 <b>Replicate API 키</b>가 설정되면 진짜 AI 가상 피팅이 작동합니다.<br>
+          지금은 <b>데모 모드</b>로 작동 중이에요. (옷 선택 시 가장 비슷한 코디 사진으로 전환)
+        </div>
+
+        <!-- 시뮬레이션 영역 -->
+        <div class="sim-view" id="simView">
+          <!-- 베이스: 아이 기본 사진 -->
+          <img class="sim-base" id="simBase"
             src="https://images.unsplash.com/photo-1609823056967-e56294bf6921?w=380&h=570&fit=crop&q=85"
-            onerror="handleChildImgErr()"
-            style="width:100%;height:100%;position:absolute;top:0;left:0;object-fit:cover"
-            alt="아이">
+            onerror="this.src='https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?w=380&h=570&fit=crop&q=85'"
+            alt="아이 사진">
 
-          <!-- 옷 오버레이 레이어들 -->
-          <div class="overlay-zone zone-accessory hidden" id="ov-accessory">
-            <img id="ov-accessory-img" src="" alt="">
-          </div>
-          <div class="overlay-zone zone-outer hidden" id="ov-outer">
-            <img id="ov-outer-img" src="" alt="">
-          </div>
-          <div class="overlay-zone zone-dress hidden" id="ov-dress">
-            <img id="ov-dress-img" src="" alt="">
-          </div>
-          <div class="overlay-zone zone-top hidden" id="ov-top">
-            <img id="ov-top-img" src="" alt="">
-          </div>
-          <div class="overlay-zone zone-bottom hidden" id="ov-bottom">
-            <img id="ov-bottom-img" src="" alt="">
-          </div>
-          <div class="overlay-zone zone-shoes hidden" id="ov-shoes">
-            <img id="ov-shoes-img" src="" alt="">
+          <!-- 로딩 오버레이 -->
+          <div class="sim-loading" id="simLoading">
+            <div class="spinner"></div>
+            <div class="loading-txt">AI가 옷을 입히는 중...</div>
+            <div class="loading-sub">잠시만 기다려주세요 (10~30초)</div>
           </div>
 
-          <!-- shimmer -->
-          <div class="sim-shimmer" id="simShimmer"></div>
-
-          <!-- 코디 이름 라벨 -->
-          <div class="sim-outfit-label">
-            <div class="ai-badge">AI 코디</div>
-            <div class="outfit-name" id="simOutfitName">옷을 선택해주세요</div>
+          <!-- AI 결과 이미지 -->
+          <div class="sim-result" id="simResult">
+            <img id="simResultImg" src="" alt="가상 피팅 결과">
           </div>
+
+          <!-- 선택 전 placeholder -->
+          <div class="sim-placeholder" id="simPlaceholder">
+            <div class="sim-placeholder-icon">👗</div>
+            <div class="sim-placeholder-txt">옷장에서 옷을 선택하면<br>AI가 아이에게 입혀드려요</div>
+          </div>
+
+          <!-- AI 배지 -->
+          <div class="sim-badge" id="simBadge" style="display:none">✨ AI 가상 피팅</div>
         </div>
 
         <!-- 선택된 옷 칩 -->
-        <div class="sim-chips" id="simChips">
-          <div class="sim-empty">옷장에서 옷을 선택하면 여기에 표시됩니다</div>
+        <div class="chips" id="simChips">
+          <div class="no-selection">옷장에서 옷을 선택해주세요</div>
         </div>
 
-        <!-- 버튼 -->
-        <div class="sim-actions">
-          <button class="sim-btn primary" onclick="autoRecommend()">✨ 자동 추천</button>
-          <button class="sim-btn secondary" onclick="goTab('wardrobe')">👚 옷장 열기</button>
+        <!-- 액션 버튼 -->
+        <div class="sim-btns">
+          <button class="sim-btn prim" onclick="runTryOn()">👗 AI 피팅 실행</button>
+          <button class="sim-btn sec" onclick="goTab('wardrobe')">옷장 열기</button>
+        </div>
+        <div class="sim-btns" style="padding-top:0">
+          <button class="sim-btn sec" onclick="resetSim()" style="flex:none;padding:10px 16px;font-size:12px">초기화</button>
+          <button class="sim-btn sec" onclick="autoSelect()" style="font-size:12px">🎲 랜덤 선택</button>
         </div>
 
-        <!-- 인플루언서 참고 -->
-        <div class="inf-section">
-          <div class="inf-title">📸 스타일 참고</div>
-          <div class="inf-scroll" id="infScroll"></div>
-        </div>
+        <!-- 참고 스타일 -->
+        <div class="ref-title">📸 스타일 참고</div>
+        <div class="ref-scroll" id="refScroll"></div>
 
       </div>
     </div>
 
-    <!-- ── TAB 4: FEED ── -->
+    <!-- ═══ FEED ═══ -->
     <div class="panel" id="tab-feed">
-      <div class="sec-header">
+      <div class="sec-hdr">
         <div class="sec-title">✨ 스타일 피드</div>
-        <div class="sec-sub">인기 코디 모음</div>
+        <div class="sec-cnt">인기 코디</div>
       </div>
-      <div class="filter-row" id="feed-filter-row">
-        <button class="filter-pill on" data-occ="전체" onclick="filterFeed(this)">전체</button>
-        <button class="filter-pill" data-occ="일상" onclick="filterFeed(this)">일상</button>
-        <button class="filter-pill" data-occ="등원" onclick="filterFeed(this)">등원</button>
-        <button class="filter-pill" data-occ="나들이" onclick="filterFeed(this)">나들이</button>
-        <button class="filter-pill" data-occ="파티" onclick="filterFeed(this)">파티</button>
+      <div class="filters" id="feed-filters">
+        <button class="fp on" data-occ="전체" onclick="filterFeed(this)">전체</button>
+        <button class="fp" data-occ="일상" onclick="filterFeed(this)">일상</button>
+        <button class="fp" data-occ="등원" onclick="filterFeed(this)">등원</button>
+        <button class="fp" data-occ="나들이" onclick="filterFeed(this)">나들이</button>
+        <button class="fp" data-occ="파티" onclick="filterFeed(this)">파티</button>
       </div>
       <div class="feed-grid" id="feed-grid"></div>
     </div>
 
   </div><!-- /content -->
 
-  <!-- BOTTOM NAV -->
   <nav class="nav">
-    <button class="nav-btn on" id="nav-home" onclick="goTab('home')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span>홈</span>
+    <button class="nb on" id="nb-home" onclick="goTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>홈
     </button>
-    <button class="nav-btn" id="nav-wardrobe" onclick="goTab('wardrobe')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-      <span>옷장</span>
+    <button class="nb" id="nb-wardrobe" onclick="goTab('wardrobe')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>옷장
     </button>
-    <button class="nav-btn" id="nav-sim" onclick="goTab('sim')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
-      <span>시뮬레이션</span>
+    <button class="nb" id="nb-sim" onclick="goTab('sim')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>AI피팅
     </button>
-    <button class="nav-btn" id="nav-feed" onclick="goTab('feed')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      <span>피드</span>
+    <button class="nb" id="nb-feed" onclick="goTab('feed')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>피드
     </button>
   </nav>
 
-  <!-- SELECTION BAR (wardrobe) -->
-  <div class="select-bar hidden" id="selectBar">
-    <div class="select-bar-txt" id="selectBarTxt">0개 선택됨</div>
-    <button class="select-bar-btn" onclick="goSimFromWardrobe()">시뮬레이션 보기 →</button>
+  <div class="sel-bar hidden" id="selBar">
+    <div class="sel-bar-txt" id="selTxt">0개 선택됨</div>
+    <button class="sel-bar-btn" onclick="goSimFromWardrobe()">AI 피팅 →</button>
   </div>
+  <button class="fab hidden" id="fab" onclick="alert('사진 촬영 기능은 앱에서 지원됩니다.')">+</button>
 
-  <!-- FAB -->
-  <button class="fab" id="fab" onclick="alert('사진 촬영 기능은 앱에서 지원됩니다.')">+</button>
-
-</div><!-- /app -->
+</div>
 
 <script>
-/* ──────────────────────────────────────────────
-   DATA
-────────────────────────────────────────────── */
-
-// 카테고리 → 오버레이 존 매핑
-const CAT_TO_ZONE = {
-  '상의':     'top',
-  '하의':     'bottom',
-  '원피스':   'dress',
-  '아우터':   'outer',
-  '신발':     'shoes',
-  '액세서리': 'accessory'
-};
-
-// 옷장 데이터
-// photoId: Unsplash에서 실제 검색으로 수집한 ID
+/* ── DATA ── */
 const CLOTHES = [
-  { id:'c1', name:'핑크 플리츠 원피스', cat:'원피스', emoji:'👗',
-    photoId:'1622290291468-a28f7a7dc6a8', clean:true },
-  { id:'c2', name:'데님 팬츠', cat:'하의', emoji:'👖',
-    photoId:'1653835785932-1710eac6385d', clean:true },
-  { id:'c3', name:'흰 레이스 블라우스', cat:'상의', emoji:'👕',
-    photoId:'1664918688104-4eb8956f97a2', clean:true },
-  { id:'c4', name:'스트라이프 티셔츠', cat:'상의', emoji:'👕',
-    photoId:'1549069786-641f4cb652c7', clean:true },
-  { id:'c5', name:'플로럴 스커트', cat:'하의', emoji:'👗',
-    photoId:'1670014543471-3b5412baa677', clean:true },
-  { id:'c6', name:'레몬 점프수트', cat:'원피스', emoji:'🌻',
-    photoId:'1625132903377-2f57b75b8a85', clean:true },
-  { id:'c7', name:'파티 드레스', cat:'원피스', emoji:'✨',
-    photoId:'1528145203756-0ed7f01ee120', clean:false },
-  { id:'c8', name:'핑크 가디건', cat:'아우터', emoji:'🧶',
-    photoId:'1562383780-8486ec2b261e', clean:true },
-  { id:'c9', name:'화이트 운동화', cat:'신발', emoji:'👟',
-    photoId:'1630305130588-0e08d0d6965e', clean:true },
-  { id:'c10',name:'메리제인 구두', cat:'신발', emoji:'👡',
-    photoId:'1578178233034-33258dacb4c2', clean:true },
-  { id:'c11',name:'리본 헤어밴드', cat:'액세서리', emoji:'🎀',
-    photoId:'1734939205476-1039385aea9f', clean:true },
-  { id:'c12',name:'꽃무늬 모자', cat:'액세서리', emoji:'👒',
-    photoId:'1599152450785-aa6bfa58d85e', clean:true },
+  {id:'c1', name:'핑크 플리츠 원피스', cat:'원피스', emoji:'👗', pid:'1622290291468-a28f7a7dc6a8', clean:true,  color:'#FFB6C1', desc:'pink floral pleated dress for toddler girl'},
+  {id:'c2', name:'데님 팬츠',          cat:'하의',   emoji:'👖', pid:'1653835785932-1710eac6385d', clean:true,  color:'#4169E1', desc:'blue denim pants for toddler girl'},
+  {id:'c3', name:'흰 레이스 블라우스', cat:'상의',   emoji:'👕', pid:'1664918688104-4eb8956f97a2', clean:true,  color:'#FFFFFF', desc:'white lace blouse for baby girl'},
+  {id:'c4', name:'스트라이프 티셔츠',  cat:'상의',   emoji:'👕', pid:'1549069786-641f4cb652c7', clean:true,  color:'#87CEEB', desc:'stripe t-shirt for toddler'},
+  {id:'c5', name:'플로럴 스커트',      cat:'하의',   emoji:'👗', pid:'1670014543471-3b5412baa677', clean:true,  color:'#FF69B4', desc:'floral skirt for baby girl'},
+  {id:'c6', name:'레몬 점프수트',      cat:'원피스', emoji:'🌻', pid:'1625132903377-2f57b75b8a85', clean:true,  color:'#FFD700', desc:'yellow lemon jumpsuit for toddler'},
+  {id:'c7', name:'파티 드레스',        cat:'원피스', emoji:'✨', pid:'1528145203756-0ed7f01ee120', clean:false, color:'#DA70D6', desc:'purple party dress for baby girl'},
+  {id:'c8', name:'핑크 가디건',        cat:'아우터', emoji:'🧶', pid:'1562383780-8486ec2b261e',   clean:true,  color:'#FFB6C1', desc:'pink knit cardigan for toddler girl'},
+  {id:'c9', name:'화이트 운동화',      cat:'신발',   emoji:'👟', pid:'1630305130588-0e08d0d6965e', clean:true,  color:'#FFFFFF', desc:'white sneakers for toddler'},
+  {id:'c10',name:'메리제인 구두',      cat:'신발',   emoji:'👡', pid:'1578178233034-33258dacb4c2', clean:true,  color:'#FF4500', desc:'red mary jane shoes for baby girl'},
+  {id:'c11',name:'리본 헤어밴드',      cat:'액세서리',emoji:'🎀', pid:'1734939205476-1039385aea9f', clean:true,  color:'#FF69B4', desc:'pink ribbon headband for girl'},
+  {id:'c12',name:'꽃무늬 모자',        cat:'액세서리',emoji:'👒', pid:'1599152450785-aa6bfa58d85e', clean:true,  color:'#DEB887', desc:'floral hat for toddler girl'},
 ];
 
-// 인플루언서 참고 사진 (실제 검색 ID)
-const INFLUENCERS = [
-  { name:'플로럴 봄 코디', tag:'나들이', photoId:'1758513422399-68a0aff34c8d' },
-  { name:'캐주얼 데일리', tag:'일상',   photoId:'1613248948503-74857459cd73' },
-  { name:'파티 드레스업', tag:'파티',   photoId:'1768625121007-817004c27c7b' },
-  { name:'등원 깔끔 룩',   tag:'등원',   photoId:'1659594219897-55702a3bd5de' },
+const REFS = [
+  {name:'봄 플로럴 코디', tag:'나들이', pid:'1758513422399-68a0aff34c8d'},
+  {name:'캐주얼 데일리',   tag:'일상',   pid:'1613248948503-74857459cd73'},
+  {name:'파티 드레스업',   tag:'파티',   pid:'1768625121007-817004c27c7b'},
+  {name:'등원 청결 룩',     tag:'등원',   pid:'1536640712-4d4c36ff0e4e'},
 ];
 
-// 스타일 피드
-const FEED = [
-  { title:'핑크 봄 코디', tags:['나들이','봄'], occ:'나들이', photoId:'1536640712-4d4c36ff0e4e' },
-  { title:'캐주얼 등원룩', tags:['등원','편안함'], occ:'등원', photoId:'1609823056967-e56294bf6921' },
-  { title:'파티 드레스', tags:['파티','특별한날'], occ:'파티', photoId:'1770155468032-fe35d04b21f8' },
-  { title:'플로럴 원피스', tags:['일상','꽃무늬'], occ:'일상', photoId:'1758513422399-68a0aff34c8d' },
-  { title:'데님 캐주얼', tags:['일상','데님'], occ:'일상', photoId:'1613248948503-74857459cd73' },
-  { title:'생일파티 룩', tags:['파티','생일'], occ:'파티', photoId:'1768625121007-817004c27c7b' },
-  { title:'봄 나들이 룩', tags:['나들이','봄'], occ:'나들이', photoId:'1555895312-fc2610acaeb3' },
-  { title:'알록달록 일상', tags:['일상','컬러풀'], occ:'일상', photoId:'1584858820878-ca1d45fb15b6' },
+const FEED_DATA = [
+  {title:'봄 핑크 코디',     tags:['나들이','봄'],    occ:'나들이', pid:'1536640712-4d4c36ff0e4e'},
+  {title:'등원 캐주얼 룩',   tags:['등원','편안'],    occ:'등원',   pid:'1609823056967-e56294bf6921'},
+  {title:'파티 드레스',       tags:['파티','특별'],    occ:'파티',   pid:'1770155468032-fe35d04b21f8'},
+  {title:'플로럴 원피스',     tags:['일상','꽃무늬'],  occ:'일상',   pid:'1758513422399-68a0aff34c8d'},
+  {title:'데님 캐주얼',       tags:['일상','데님'],    occ:'일상',   pid:'1613248948503-74857459cd73'},
+  {title:'생일파티 룩',       tags:['파티','생일'],    occ:'파티',   pid:'1768625121007-817004c27c7b'},
+  {title:'봄 나들이 룩',      tags:['나들이','봄'],    occ:'나들이', pid:'1555895312-fc2610acaeb3'},
+  {title:'컬러풀 일상',       tags:['일상','컬러풀'],  occ:'일상',   pid:'1584858820878-ca1d45fb15b6'},
 ];
 
-/* ──────────────────────────────────────────────
-   STATE
-────────────────────────────────────────────── */
-let selectedIds = new Set();
-let currentTab = 'home';
-let likedFeed = new Set();
+/* ── STATE ── */
+let selected = new Set();
 let currentCat = '전체';
+let liked = new Set();
+let tryOnRunning = false;
 
-/* ──────────────────────────────────────────────
-   HELPERS
-────────────────────────────────────────────── */
-function uImg(photoId, w, h) {
-  return `https://images.unsplash.com/photo-${photoId}?w=${w}&h=${h}&fit=crop&q=80`;
+/* ── UTILS ── */
+const U = (id,w,h) => `https://images.unsplash.com/photo-${id}?w=${w}&h=${h}&fit=crop&q=80`;
+
+/* ── NAV ── */
+function goTab(t) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+t).classList.add('on');
+  document.getElementById('nb-'+t).classList.add('on');
+  const fab=document.getElementById('fab'), sb=document.getElementById('selBar');
+  if(t==='wardrobe'){fab.classList.remove('hidden');updateSelBar();}
+  else{fab.classList.add('hidden');sb.classList.add('hidden');}
+  if(t==='sim') renderChips();
+  if(t==='feed') renderFeed();
+  if(t==='wardrobe') renderClothes();
 }
 
-function imgTag(src, alt, cls, onerr) {
-  const errFn = onerr || `this.style.display='none'`;
-  return `<img src="${src}" alt="${alt}" class="${cls}" onerror="${errFn}" loading="lazy">`;
-}
-
-/* ──────────────────────────────────────────────
-   NAVIGATION
-────────────────────────────────────────────── */
-function goTab(tab) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('on'));
-  document.getElementById('tab-' + tab).classList.add('on');
-  document.getElementById('nav-' + tab).classList.add('on');
-  currentTab = tab;
-
-  // fab & selectBar visibility
-  const fab = document.getElementById('fab');
-  const sb  = document.getElementById('selectBar');
-  if (tab === 'wardrobe') {
-    fab.classList.remove('hidden');
-    updateSelectBar();
-  } else {
-    fab.classList.add('hidden');
-    sb.classList.add('hidden');
-  }
-
-  if (tab === 'sim') renderSimChips();
-  if (tab === 'feed') renderFeed();
-  if (tab === 'wardrobe') renderClothes();
-}
-
-/* ──────────────────────────────────────────────
-   WARDROBE
-────────────────────────────────────────────── */
-function filterClothes(btn) {
-  document.querySelectorAll('#filter-row .filter-pill').forEach(b => b.classList.remove('on'));
+/* ── WARDROBE ── */
+function filterCat(btn){
+  document.querySelectorAll('#cat-filters .fp').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  currentCat = btn.dataset.cat;
+  currentCat=btn.dataset.cat;
   renderClothes();
 }
-
-function renderClothes() {
-  const list = currentCat === '전체'
-    ? CLOTHES
-    : CLOTHES.filter(c => c.cat === currentCat);
-
-  const grid = document.getElementById('clothes-grid');
-  grid.innerHTML = list.map(c => {
-    const sel = selectedIds.has(c.id) ? 'selected' : '';
-    const dirty = c.clean ? '' : 'dirty';
-    const imgSrc = uImg(c.photoId, 300, 300);
-    return `
-    <div class="cloth-card ${sel} ${dirty}" id="card-${c.id}" onclick="toggleSelect('${c.id}')">
-      <div class="cloth-img-wrap">
-        <img class="cloth-img"
-          src="${imgSrc}"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
-          alt="${c.name}" loading="lazy">
-        <div class="cloth-img-placeholder" style="display:none">${c.emoji}</div>
+function renderClothes(){
+  const list = currentCat==='전체' ? CLOTHES : CLOTHES.filter(c=>c.cat===currentCat);
+  document.getElementById('cloth-grid').innerHTML = list.map(c=>`
+    <div class="cc ${selected.has(c.id)?'sel':''} ${c.clean?'':'dirty'}" onclick="toggle('${c.id}')">
+      <div class="cc-img-wrap">
+        <img class="cc-img" src="${U(c.pid,300,300)}" alt="${c.name}"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" loading="lazy">
+        <div class="cc-fallback" style="display:none">${c.emoji}</div>
       </div>
-      <div class="cloth-info">
-        <div class="cloth-name">${c.name}</div>
-        <div class="cloth-meta">
-          <span class="cloth-cat">${c.cat}</span>
-          <button class="cloth-laundry" onclick="toggleLaundry(event,'${c.id}')" title="${c.clean?'세탁필요':'세탁완료'}">
-            ${c.clean ? '✅' : '🧺'}
-          </button>
+      <div class="cc-body">
+        <div class="cc-name">${c.name}</div>
+        <div class="cc-row">
+          <span class="cc-cat">${c.cat}</span>
+          <button class="cc-wash" onclick="toggleWash(event,'${c.id}')">${c.clean?'✅':'🧺'}</button>
         </div>
       </div>
-    </div>`;
-  }).join('');
-}
-
-function toggleSelect(id) {
-  if (selectedIds.has(id)) selectedIds.delete(id);
-  else selectedIds.add(id);
-  renderClothes();
-  updateSelectBar();
-  updateSimOverlays();
-}
-
-function toggleLaundry(e, id) {
-  e.stopPropagation();
-  const c = CLOTHES.find(x => x.id === id);
-  if (c) { c.clean = !c.clean; renderClothes(); updateStats(); }
-}
-
-function updateSelectBar() {
-  const sb = document.getElementById('selectBar');
-  const txt = document.getElementById('selectBarTxt');
-  if (selectedIds.size > 0) {
-    sb.classList.remove('hidden');
-    txt.textContent = `${selectedIds.size}개 선택됨`;
-  } else {
-    sb.classList.add('hidden');
-  }
-}
-
-function goSimFromWardrobe() {
-  goTab('sim');
-  showShimmer(600);
-  setTimeout(updateSimOverlays, 200);
-}
-
-/* ──────────────────────────────────────────────
-   SIMULATION OVERLAYS
-   각 카테고리 옷이 아이 사진 위 해당 위치에 표시
-────────────────────────────────────────────── */
-function updateSimOverlays() {
-  // 모든 오버레이 숨기기
-  Object.values(CAT_TO_ZONE).forEach(zone => {
-    document.getElementById('ov-' + zone).classList.add('hidden');
-    document.getElementById('ov-' + zone).classList.remove('visible');
-  });
-
-  const selected = CLOTHES.filter(c => selectedIds.has(c.id));
-
-  // 카테고리별로 마지막 선택 항목 오버레이에 표시
-  const byZone = {};
-  selected.forEach(c => {
-    const zone = CAT_TO_ZONE[c.cat];
-    if (zone) byZone[zone] = c;
-  });
-
-  // 원피스 선택 시 상의/하의 오버레이 제거 (원피스가 전신 커버)
-  if (byZone['dress']) {
-    delete byZone['top'];
-    delete byZone['bottom'];
-  }
-
-  Object.entries(byZone).forEach(([zone, cloth]) => {
-    const ov = document.getElementById('ov-' + zone);
-    const img = document.getElementById('ov-' + zone + '-img');
-    if (ov && img) {
-      img.src = uImg(cloth.photoId, 200, 200);
-      img.alt = cloth.name;
-      ov.classList.remove('hidden');
-      ov.classList.add('visible');
-    }
-  });
-
-  // 라벨 업데이트
-  const label = document.getElementById('simOutfitName');
-  if (selected.length === 0) {
-    label.textContent = '옷을 선택해주세요';
-  } else {
-    label.textContent = selected.map(c => c.name).join(' + ');
-  }
-
-  renderSimChips();
-}
-
-function showShimmer(ms) {
-  const sh = document.getElementById('simShimmer');
-  sh.classList.add('on');
-  setTimeout(() => sh.classList.remove('on'), ms);
-}
-
-function renderSimChips() {
-  const chips = document.getElementById('simChips');
-  const selected = CLOTHES.filter(c => selectedIds.has(c.id));
-  if (selected.length === 0) {
-    chips.innerHTML = '<div class="sim-empty">옷장에서 옷을 선택하면 여기에 표시됩니다</div>';
-    return;
-  }
-  chips.innerHTML = selected.map(c => `
-    <div class="sim-chip" onclick="removeItem('${c.id}')">
-      <img src="${uImg(c.photoId, 48, 48)}"
-           onerror="this.style.display='none'"
-           alt="${c.name}">
-      <span>${c.name}</span>
-      <span class="x">✕</span>
     </div>`).join('');
 }
+function toggle(id){
+  selected.has(id)?selected.delete(id):selected.add(id);
+  renderClothes(); updateSelBar(); renderChips();
+}
+function toggleWash(e,id){
+  e.stopPropagation();
+  const c=CLOTHES.find(x=>x.id===id);
+  if(c){c.clean=!c.clean;renderClothes();updateStats();}
+}
+function updateSelBar(){
+  const sb=document.getElementById('selBar'),txt=document.getElementById('selTxt');
+  if(selected.size>0){sb.classList.remove('hidden');txt.textContent=`${selected.size}개 선택됨`;}
+  else sb.classList.add('hidden');
+}
+function goSimFromWardrobe(){goTab('sim');renderChips();}
 
-function removeItem(id) {
-  selectedIds.delete(id);
-  updateSimOverlays();
-  renderSimChips();
-  updateSelectBar();
-  if (currentTab === 'wardrobe') renderClothes();
+/* ── SIMULATION ── */
+function renderChips(){
+  const el=document.getElementById('simChips');
+  const items=CLOTHES.filter(c=>selected.has(c.id));
+  if(!items.length){el.innerHTML='<div class="no-selection">옷장에서 옷을 선택해주세요</div>';return;}
+  el.innerHTML=items.map(c=>`
+    <div class="chip" onclick="removeChip('${c.id}')">
+      <img src="${U(c.pid,52,52)}" onerror="this.style.display='none'" alt="">
+      <span class="chip-name">${c.name}</span>
+      <span class="chip-x">✕</span>
+    </div>`).join('');
+}
+function removeChip(id){
+  selected.delete(id);
+  renderChips(); updateSelBar();
+  if(document.getElementById('tab-wardrobe').classList.contains('on')) renderClothes();
 }
 
-function autoRecommend() {
-  // 랜덤 코디 자동 선택
-  selectedIds.clear();
-  const cleanClothes = CLOTHES.filter(c => c.clean);
-  // 원피스 or 상의+하의 선택
-  const dresses = cleanClothes.filter(c => c.cat === '원피스');
-  const tops    = cleanClothes.filter(c => c.cat === '상의');
-  const bottoms = cleanClothes.filter(c => c.cat === '하의');
-  const shoes   = cleanClothes.filter(c => c.cat === '신발');
-  const accs    = cleanClothes.filter(c => c.cat === '액세서리');
-  const outers  = cleanClothes.filter(c => c.cat === '아우터');
+async function runTryOn(){
+  const items=CLOTHES.filter(c=>selected.has(c.id));
+  if(!items.length){alert('먼저 옷장에서 옷을 선택해주세요!');return;}
+  if(tryOnRunning) return;
 
-  const useDress = Math.random() > 0.4 && dresses.length > 0;
-  if (useDress) {
-    selectedIds.add(dresses[Math.floor(Math.random() * dresses.length)].id);
-  } else {
-    if (tops.length)    selectedIds.add(tops[Math.floor(Math.random() * tops.length)].id);
-    if (bottoms.length) selectedIds.add(bottoms[Math.floor(Math.random() * bottoms.length)].id);
+  tryOnRunning=true;
+  // 로딩 표시
+  document.getElementById('simPlaceholder').style.display='none';
+  document.getElementById('simResult').classList.remove('on');
+  document.getElementById('simLoading').classList.add('on');
+  document.getElementById('simBadge').style.display='none';
+
+  // 베이스 이미지 URL
+  const baseUrl = document.getElementById('simBase').src;
+  // 선택된 첫 번째 옷 이미지 URL (주요 아이템)
+  const mainItem = items[0];
+  const garmentUrl = U(mainItem.pid, 400, 400);
+
+  try {
+    const res = await fetch('/api/tryon', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        personImageUrl: baseUrl,
+        garmentImageUrl: garmentUrl,
+        garmentDescription: mainItem.desc
+      })
+    });
+    const data = await res.json();
+
+    document.getElementById('simLoading').classList.remove('on');
+
+    if(data.success && data.resultUrl){
+      // AI 결과 표시
+      const img=document.getElementById('simResultImg');
+      img.src=data.resultUrl;
+      img.onload=()=>{
+        document.getElementById('simResult').classList.add('on');
+        document.getElementById('simBadge').style.display='block';
+      };
+    } else {
+      // 데모 모드: 유사한 사진으로 전환
+      demoFallback(items);
+    }
+  } catch(err) {
+    // API 미연결 → 데모 모드
+    document.getElementById('simLoading').classList.remove('on');
+    demoFallback(items);
   }
-  if (shoes.length && Math.random() > 0.3)
-    selectedIds.add(shoes[Math.floor(Math.random() * shoes.length)].id);
-  if (accs.length && Math.random() > 0.5)
-    selectedIds.add(accs[Math.floor(Math.random() * accs.length)].id);
-  if (outers.length && Math.random() > 0.6)
-    selectedIds.add(outers[Math.floor(Math.random() * outers.length)].id);
-
-  showShimmer(800);
-  setTimeout(() => {
-    updateSimOverlays();
-    renderSimChips();
-  }, 400);
+  tryOnRunning=false;
 }
 
-function handleChildImgErr() {
-  const img = document.getElementById('simChildImg');
-  // 대체 이미지 시도
-  const fallbacks = [
-    '1609823782420-098cc593b516',
-    '1759593218443-38dbd27056c6',
-    '1768509197002-6bac59ccddbb',
+// 데모 모드: 유사 스타일 사진으로 전환 (API 키 없을 때)
+function demoFallback(items){
+  const demoPhotos=[
+    '1536640712-4d4c36ff0e4e',
+    '1609823056967-e56294bf6921',
+    '1758513422399-68a0aff34c8d',
+    '1613248948503-74857459cd73',
+    '1768625121007-817004c27c7b',
+    '1555895312-fc2610acaeb3',
   ];
-  const cur = img.dataset.fallbackIdx || 0;
-  if (cur < fallbacks.length) {
-    img.src = uImg(fallbacks[cur], 380, 570);
-    img.dataset.fallbackIdx = +cur + 1;
-  } else {
-    img.style.display = 'none';
-    const wrap = document.getElementById('simWrap');
-    wrap.style.background = 'linear-gradient(135deg, #FFD6E7, #E8E2FF)';
-    wrap.innerHTML += '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:100px;text-align:center">👧</div>';
-  }
+  const pick=demoPhotos[Math.floor(Math.random()*demoPhotos.length)];
+  const img=document.getElementById('simResultImg');
+  img.src=U(pick,380,570);
+  img.onload=()=>{
+    document.getElementById('simResult').classList.add('on');
+    document.getElementById('simBadge').style.display='block';
+    document.getElementById('simBadge').textContent='📸 유사 코디 참고';
+  };
+  img.onerror=()=>{ document.getElementById('simPlaceholder').style.display='flex'; };
 }
 
-/* ──────────────────────────────────────────────
-   INFLUENCERS
-────────────────────────────────────────────── */
-function renderInfluencers() {
-  const el = document.getElementById('infScroll');
-  if (!el) return;
-  el.innerHTML = INFLUENCERS.map(inf => `
-    <div class="inf-card">
-      <img src="${uImg(inf.photoId, 280, 360)}"
-           onerror="this.style.background='var(--pink3)';this.style.height='180px'"
-           alt="${inf.name}" loading="lazy">
-      <div class="inf-card-info">
-        <div class="inf-card-name">${inf.name}</div>
-        <div class="inf-card-tag">#${inf.tag}</div>
+function resetSim(){
+  selected.clear();
+  renderChips(); updateSelBar(); renderClothes();
+  document.getElementById('simResult').classList.remove('on');
+  document.getElementById('simLoading').classList.remove('on');
+  document.getElementById('simPlaceholder').style.display='flex';
+  document.getElementById('simBadge').style.display='none';
+}
+
+function autoSelect(){
+  selected.clear();
+  const clean=CLOTHES.filter(c=>c.clean);
+  const dresses=clean.filter(c=>c.cat==='원피스');
+  const tops=clean.filter(c=>c.cat==='상의');
+  const bottoms=clean.filter(c=>c.cat==='하의');
+  const shoes=clean.filter(c=>c.cat==='신발');
+  const accs=clean.filter(c=>c.cat==='액세서리');
+  const outers=clean.filter(c=>c.cat==='아우터');
+  const r=a=>a[Math.floor(Math.random()*a.length)];
+  if(dresses.length&&Math.random()>.4) selected.add(r(dresses).id);
+  else{ if(tops.length) selected.add(r(tops).id); if(bottoms.length) selected.add(r(bottoms).id); }
+  if(shoes.length&&Math.random()>.3) selected.add(r(shoes).id);
+  if(accs.length&&Math.random()>.5) selected.add(r(accs).id);
+  if(outers.length&&Math.random()>.6) selected.add(r(outers).id);
+  renderChips(); updateSelBar(); renderClothes();
+}
+
+/* ── REFS ── */
+function renderRefs(){
+  document.getElementById('refScroll').innerHTML=REFS.map(r=>`
+    <div class="ref-card">
+      <img src="${U(r.pid,260,330)}" alt="${r.name}"
+        onerror="this.style.background='var(--pink3)';this.style.height='165px'" loading="lazy">
+      <div class="ref-card-body">
+        <div class="ref-card-name">${r.name}</div>
+        <div class="ref-card-tag">#${r.tag}</div>
       </div>
     </div>`).join('');
 }
 
-/* ──────────────────────────────────────────────
-   FEED
-────────────────────────────────────────────── */
-function filterFeed(btn) {
-  document.querySelectorAll('#feed-filter-row .filter-pill').forEach(b => b.classList.remove('on'));
+/* ── FEED ── */
+function filterFeed(btn){
+  document.querySelectorAll('#feed-filters .fp').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   renderFeed(btn.dataset.occ);
 }
-
-function renderFeed(occ) {
-  const list = (!occ || occ === '전체') ? FEED : FEED.filter(f => f.occ === occ);
-  const grid = document.getElementById('feed-grid');
-  grid.innerHTML = list.map((f, i) => `
-    <div class="feed-card">
-      <img src="${uImg(f.photoId, 300, 400)}"
-           onerror="this.style.background='var(--pink3)';this.style.height='200px'"
-           alt="${f.title}" loading="lazy">
-      <button class="feed-heart ${likedFeed.has(i)?'liked':''}"
-              onclick="toggleLike(event,${i},this)">
-        ${likedFeed.has(i) ? '❤️' : '🤍'}
+function renderFeed(occ){
+  const list=(!occ||occ==='전체')?FEED_DATA:FEED_DATA.filter(f=>f.occ===occ);
+  document.getElementById('feed-grid').innerHTML=list.map((f,i)=>`
+    <div class="fc">
+      <img src="${U(f.pid,300,400)}" alt="${f.title}"
+        onerror="this.style.background='var(--pink3)'" loading="lazy">
+      <button class="heart-btn ${liked.has(i)?'liked':''}" onclick="toggleLike(event,${i},this)">
+        ${liked.has(i)?'❤️':'🤍'}
       </button>
-      <div class="feed-card-info">
-        <div class="feed-card-title">${f.title}</div>
-        <div class="feed-card-tags">${f.tags.map(t=>`<span class="feed-tag">#${t}</span>`).join('')}</div>
+      <div class="fc-info">
+        <div class="fc-title">${f.title}</div>
+        <div class="fc-tags">${f.tags.map(t=>`<span class="fc-tag">#${t}</span>`).join('')}</div>
       </div>
-      <button class="feed-apply" onclick="applyFeedOutfit(${i})">내 아이에게 적용 →</button>
+      <button class="apply-btn" onclick="applyFeed(${i})">내 아이에게 적용 →</button>
     </div>`).join('');
 }
-
-function toggleLike(e, i, btn) {
+function toggleLike(e,i,btn){
   e.stopPropagation();
-  if (likedFeed.has(i)) likedFeed.delete(i);
-  else likedFeed.add(i);
-  btn.textContent = likedFeed.has(i) ? '❤️' : '🤍';
-  btn.classList.toggle('liked', likedFeed.has(i));
+  liked.has(i)?liked.delete(i):liked.add(i);
+  btn.textContent=liked.has(i)?'❤️':'🤍';
+  btn.classList.toggle('liked',liked.has(i));
+}
+function applyFeed(i){ autoSelect(); goTab('sim'); }
+
+/* ── STATS ── */
+function updateStats(){
+  document.getElementById('s-total').textContent=CLOTHES.length;
+  document.getElementById('s-clean').textContent=CLOTHES.filter(c=>c.clean).length;
 }
 
-function applyFeedOutfit(i) {
-  // 피드 아이템 적용 → 랜덤 코디 추천으로 이동
-  autoRecommend();
-  goTab('sim');
-}
-
-/* ──────────────────────────────────────────────
-   STATS
-────────────────────────────────────────────── */
-function updateStats() {
-  document.getElementById('stat-total').textContent = CLOTHES.length;
-  document.getElementById('stat-clean').textContent = CLOTHES.filter(c=>c.clean).length;
-}
-
-/* ──────────────────────────────────────────────
-   INIT
-────────────────────────────────────────────── */
-window.onload = function() {
-  renderClothes();
-  renderInfluencers();
-  renderFeed();
-  updateStats();
-
-  // 오늘 날짜
-  const d = new Date();
-  const days = ['일','월','화','수','목','금','토'];
-  document.getElementById('today-date').textContent =
+/* ── INIT ── */
+window.onload=()=>{
+  renderClothes(); renderRefs(); renderFeed(); updateStats();
+  const d=new Date();
+  const days=['일','월','화','수','목','금','토'];
+  document.getElementById('banner-date').textContent=
     `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${days[d.getDay()]}요일`;
-
-  const h = d.getHours();
-  const greet = h < 12 ? '좋은 아침이에요!' : h < 17 ? '좋은 오후예요!' : '좋은 저녁이에요!';
-  document.getElementById('greeting').textContent = greet + ' 오늘도 예쁘게 입혀봐요 💕';
+  const h=d.getHours();
+  document.getElementById('banner-msg').textContent=
+    (h<12?'좋은 아침이에요!':h<17?'좋은 오후예요!':'좋은 저녁이에요!')+' 오늘도 예쁘게 입혀봐요 💕';
 };
 </script>
 </body>
