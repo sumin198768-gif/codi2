@@ -511,6 +511,7 @@ function removeChip(id){
 }
 
 const PROXY = 'https://codi2.vercel.app';
+const HF_SPACE = 'https://yisol-idm-vton.hf.space';
 
 async function runTryOn(){
   const items=CLOTHES.filter(c=>selected.has(c.id));
@@ -524,80 +525,107 @@ async function runTryOn(){
   document.getElementById('simBadge').style.display='none';
 
   const token = localStorage.getItem('replicate_token');
-  const hfToken = localStorage.getItem('hf_token');
 
   const mainItem = items.find(c=>c.cat==='원피스'||c.cat==='상의') || items[0];
   const personUrl = 'https://images.unsplash.com/photo-1609823056967-e56294bf6921?w=768&h=1024&fit=crop&q=90';
   const garmentUrl = U(mainItem.pid, 768, 768);
 
   try {
-    // 1. 예측 생성 (토큰 있으면 Replicate, 없으면 HF Space 무료)
-    const createRes = await fetch(`${PROXY}/api/predict`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        personImageUrl: personUrl,
-        garmentImageUrl: garmentUrl,
-        garmentDescription: mainItem.desc || mainItem.name,
-        ...(token ? { token } : {}),
-        ...(hfToken ? { hfToken } : {})
-      })
-    });
-
-    if(!createRes.ok){
-      const err = await createRes.json();
-      throw new Error(err.error || 'API 오류 '+createRes.status);
-    }
-
-    const pred = await createRes.json();
-    const { id, provider } = pred;
-
-    if(provider==='hf'){
-      const queueMsg = document.getElementById('simLoadingMsg');
-      if(queueMsg) queueMsg.textContent = '무료 AI 처리 중... (1-3분 소요)';
-    }
-
-    // 2. 폴링 (최대 180초)
-    let output = null;
-    for(let i=0; i<60; i++){
-      await new Promise(r=>setTimeout(r,3000));
-      let pollUrl = `${PROXY}/api/status?id=${encodeURIComponent(id)}&provider=${provider||'replicate'}`;
-      if(token) pollUrl += `&token=${encodeURIComponent(token)}`;
-      if(hfToken) pollUrl += `&hfToken=${encodeURIComponent(hfToken)}`;
-
-      const pollRes = await fetch(pollUrl);
-      const status = await pollRes.json();
-      if(status.status==='succeeded'){ output=status.output; break; }
-      if(status.status==='failed') throw new Error('AI 처리 실패: '+(status.error||''));
-    }
-
-    document.getElementById('simLoading').classList.remove('on');
-
-    if(output){
-      const resultUrl = Array.isArray(output) ? output[0] : output;
-      const img = document.getElementById('simResultImg');
-      img.src = resultUrl;
-      img.onload = ()=>{
-        document.getElementById('simResult').classList.add('on');
-        document.getElementById('simBadge').style.display='block';
-        document.getElementById('simBadge').textContent='✨ AI 가상 피팅 완료';
-      };
+    if(token){
+      // Replicate 유료 모드 (Vercel 프록시 경유)
+      await runTryOnReplicate(token, personUrl, garmentUrl, mainItem);
     } else {
-      throw new Error('결과를 받지 못했습니다.');
+      // HuggingFace Space 무료 모드 (직접 호출)
+      await runTryOnHuggingFace(personUrl, garmentUrl, mainItem);
     }
-
   } catch(err){
     document.getElementById('simLoading').classList.remove('on');
     console.error(err);
-    if(err.message.includes('401')||err.message.includes('Unauthorized')){
-      alert('API 키가 올바르지 않아요. 설정에서 다시 확인해주세요.');
-      openSettings();
-    } else {
-      alert('AI 처리 중 오류: '+err.message+'\n\n데모 모드로 전환합니다.');
-      demoFallback(items);
-    }
+    alert('AI 처리 중 오류: '+err.message+'\n\n데모 모드로 전환합니다.');
+    demoFallback(items);
   }
   tryOnRunning=false;
+}
+
+async function runTryOnHuggingFace(personUrl, garmentUrl, item){
+  const sessionHash = Math.random().toString(36).substring(2, 12);
+  const makeFile = url => ({path:url, url, orig_name:'image.jpg', meta:{_type:'gradio.FileData'}});
+
+  const joinRes = await fetch(`${HF_SPACE}/queue/join`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      fn_index: 2,
+      api_name: '/tryon',
+      data: [
+        {background: makeFile(personUrl), layers:[], composite:null},
+        makeFile(garmentUrl),
+        item.desc || item.name || 'outfit',
+        true, false, 30, 42
+      ],
+      session_hash: sessionHash,
+      event_data: null
+    })
+  });
+
+  if(!joinRes.ok) throw new Error('HF Space 연결 실패 ('+joinRes.status+')');
+
+  // SSE로 결과 수신
+  await new Promise((resolve, reject) => {
+    const es = new EventSource(`${HF_SPACE}/queue/data?session_hash=${sessionHash}`);
+    const timeout = setTimeout(()=>{ es.close(); reject(new Error('시간 초과 (3분)')); }, 180000);
+
+    es.onmessage = e => {
+      try {
+        const ev = JSON.parse(e.data);
+        if(ev.msg === 'process_completed'){
+          clearTimeout(timeout); es.close();
+          const out = ev.output?.data;
+          const url = Array.isArray(out) && out[0] ? (out[0].url || `${HF_SPACE}/file=${out[0].path}`) : null;
+          if(!url) return reject(new Error('결과 이미지 없음'));
+          showResult(url);
+          resolve();
+        } else if(ev.msg === 'queue_full'){
+          clearTimeout(timeout); es.close();
+          reject(new Error('HF 대기열 가득 참, 잠시 후 다시 시도하세요'));
+        }
+      } catch(e){}
+    };
+    es.onerror = () => { clearTimeout(timeout); es.close(); reject(new Error('HF Space 연결 오류')); };
+  });
+}
+
+async function runTryOnReplicate(token, personUrl, garmentUrl, item){
+  const desc = (item.desc||item.name||'').toLowerCase();
+  const category = (desc.includes('dress')||desc.includes('원피스')||desc.includes('jumpsuit')) ? 'dresses'
+    : (desc.includes('pants')||desc.includes('skirt')||desc.includes('하의')||desc.includes('팬츠')||desc.includes('스커트')) ? 'lower_body'
+    : 'upper_body';
+
+  const createRes = await fetch(`${PROXY}/api/predict`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({personImageUrl:personUrl, garmentImageUrl:garmentUrl, garmentDescription:item.desc||item.name, token})
+  });
+  if(!createRes.ok){ const e=await createRes.json(); throw new Error(e.error||'API 오류'); }
+  const {id} = await createRes.json();
+
+  for(let i=0;i<60;i++){
+    await new Promise(r=>setTimeout(r,3000));
+    const s = await fetch(`${PROXY}/api/status?id=${encodeURIComponent(id)}&token=${encodeURIComponent(token)}`).then(r=>r.json());
+    if(s.status==='succeeded'){ showResult(Array.isArray(s.output)?s.output[0]:s.output); return; }
+    if(s.status==='failed') throw new Error('처리 실패: '+(s.error||''));
+  }
+  throw new Error('시간 초과');
+}
+
+function showResult(url){
+  document.getElementById('simLoading').classList.remove('on');
+  const img = document.getElementById('simResultImg');
+  img.src = url;
+  img.onload = ()=>{
+    document.getElementById('simResult').classList.add('on');
+    document.getElementById('simBadge').style.display='block';
+    document.getElementById('simBadge').textContent='✨ AI 가상 피팅 완료';
+  };
 }
 
 // 데모 모드: 유사 스타일 사진으로 전환 (API 키 없을 때)
