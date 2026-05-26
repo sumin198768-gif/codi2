@@ -4,1673 +4,1984 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>코디맘 - 아이 옷 코디 도우미</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --primary: #FF8FAB;
-    --primary-light: #FFB3C6;
-    --primary-dark: #E8607A;
-    --secondary: #C9B8FF;
-    --secondary-light: #DDD5FF;
-    --accent: #FFD6E7;
-    --accent2: #B5EAD7;
-    --accent3: #FFDAC1;
-    --bg: #FFF5F8;
-    --bg2: #FFFFFF;
-    --text: #4A3F4A;
-    --text-light: #9B8FA0;
-    --text-xs: #BFB2C3;
-    --border: #F0E6F0;
-    --shadow: rgba(255,143,171,0.15);
-    --shadow-md: rgba(255,143,171,0.25);
-    --radius: 18px;
-    --radius-sm: 12px;
-    --radius-xs: 8px;
-  }
+:root {
+  --primary: #FF8FAB;
+  --primary-light: #FFB3C6;
+  --primary-dark: #E8607A;
+  --secondary: #C9B8FF;
+  --secondary-light: #DDD5FF;
+  --accent: #FFD6E7;
+  --accent2: #B5EAD7;
+  --accent3: #FFDAC1;
+  --bg: #FFF5F8;
+  --card: #FFFFFF;
+  --text: #2D2D2D;
+  --text-muted: #888;
+  --text-light: #BBB;
+  --border: #F0E6EC;
+  --shadow: 0 4px 20px rgba(255,143,171,0.12);
+  --shadow-md: 0 8px 32px rgba(255,143,171,0.18);
+  --shadow-lg: 0 16px 48px rgba(255,143,171,0.22);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --nav-h: 72px;
+  --header-h: 60px;
+}
 
-  html, body {
-    height: 100%;
-    background: #F0E4F0;
-    font-family: 'Noto Sans KR', sans-serif;
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
-  }
+html, body {
+  height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
 
-  #app {
-    max-width: 390px;
-    margin: 0 auto;
-    height: 100vh;
-    background: var(--bg);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 0 40px rgba(0,0,0,0.15);
-  }
+body {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
 
-  /* ========== STATUS BAR ========== */
-  .status-bar {
-    background: var(--bg2);
-    padding: 12px 20px 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text);
-    flex-shrink: 0;
-  }
-  .status-bar .time { font-size: 15px; font-weight: 700; }
-  .status-icons { display: flex; gap: 5px; align-items: center; }
-  .status-icons svg { width: 16px; height: 16px; }
+#app {
+  width: 100%;
+  max-width: 390px;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
-  /* ========== HEADER ========== */
-  .app-header {
-    background: var(--bg2);
-    padding: 0 20px 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-shrink: 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .logo-icon {
-    width: 34px; height: 34px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-  .logo-text { font-size: 18px; font-weight: 700; color: var(--primary-dark); letter-spacing: -0.5px; }
-  .header-actions { display: flex; gap: 10px; }
-  .icon-btn {
-    width: 36px; height: 36px;
-    border: none; background: var(--accent);
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s;
-    color: var(--primary-dark);
-  }
-  .icon-btn:hover { background: var(--primary-light); transform: scale(1.05); }
-  .icon-btn svg { width: 18px; height: 18px; }
+/* ========== SCROLLABLE CONTENT ========== */
+.tab-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: calc(var(--nav-h) + 16px);
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
 
-  /* ========== SCREENS ========== */
-  .screens-container {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-  }
-  .screen {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 16px 16px 20px;
-    opacity: 0;
-    transform: translateX(30px);
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    -webkit-overflow-scrolling: touch;
-  }
-  .screen.active {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: all;
-  }
-  .screen.exit-left {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
+.tab-panel {
+  display: none;
+  padding: 0;
+  animation: fadeIn 0.25s ease;
+}
+.tab-panel.active {
+  display: block;
+}
 
-  /* ========== BOTTOM NAV ========== */
-  .bottom-nav {
-    background: var(--bg2);
-    border-top: 1px solid var(--border);
-    display: flex;
-    padding: 8px 0 20px;
-    flex-shrink: 0;
-    box-shadow: 0 -4px 20px var(--shadow);
-  }
-  .nav-item {
-    flex: 1;
-    display: flex; flex-direction: column;
-    align-items: center; gap: 4px;
-    cursor: pointer;
-    padding: 6px 0;
-    border: none; background: none;
-    transition: all 0.2s;
-  }
-  .nav-icon {
-    width: 28px; height: 28px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 8px;
-    transition: all 0.2s;
-    color: var(--text-light);
-  }
-  .nav-icon svg { width: 22px; height: 22px; }
-  .nav-label { font-size: 10px; font-weight: 500; color: var(--text-light); transition: color 0.2s; }
-  .nav-item.active .nav-icon { background: var(--accent); color: var(--primary-dark); }
-  .nav-item.active .nav-label { color: var(--primary-dark); font-weight: 700; }
-  .nav-item:hover .nav-icon { background: var(--accent); }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  /* ========== SECTION TITLES ========== */
-  .section-title {
-    font-size: 16px; font-weight: 700;
-    color: var(--text); margin-bottom: 12px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .section-title .dot {
-    width: 6px; height: 6px;
-    background: var(--primary); border-radius: 50%;
-    display: inline-block;
-  }
+/* ========== TOP HEADER ========== */
+.top-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,245,248,0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+}
+.top-header .logo {
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+.top-header .header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s, background 0.15s;
+}
+.header-icon-btn:active { transform: scale(0.92); }
 
-  /* ============================================================
-     SCREEN 1 — HOME
-  ============================================================ */
+/* ========== BOTTOM NAV ========== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 390px;
+  height: var(--nav-h);
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  padding-top: 8px;
+  z-index: 200;
+  box-shadow: 0 -4px 20px rgba(255,143,171,0.10);
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  transition: transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-item:active { transform: scale(0.92); }
+.nav-icon {
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.nav-icon svg { transition: fill 0.2s, stroke 0.2s; }
+.nav-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+.nav-item.active .nav-label { color: var(--primary); font-weight: 700; }
+.nav-item.active .nav-icon-bg {
+  background: var(--accent);
+  border-radius: 12px;
+  padding: 4px 10px;
+}
+.nav-dot {
+  position: absolute;
+  top: -2px; right: -2px;
+  width: 8px; height: 8px;
+  background: var(--primary);
+  border-radius: 50%;
+  border: 2px solid white;
+}
 
-  /* Profile Card */
-  .profile-card {
-    background: linear-gradient(135deg, #FF8FAB 0%, #C9B8FF 100%);
-    border-radius: var(--radius);
-    padding: 20px;
-    color: white;
-    margin-bottom: 16px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 8px 24px var(--shadow-md);
-  }
-  .profile-card::before {
-    content: '';
-    position: absolute;
-    top: -30px; right: -30px;
-    width: 120px; height: 120px;
-    background: rgba(255,255,255,0.12);
-    border-radius: 50%;
-  }
-  .profile-card::after {
-    content: '';
-    position: absolute;
-    bottom: -20px; right: 30px;
-    width: 80px; height: 80px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 50%;
-  }
-  .profile-top { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
-  .avatar-wrap {
-    width: 62px; height: 62px;
-    background: rgba(255,255,255,0.25);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    border: 2px solid rgba(255,255,255,0.5);
-    flex-shrink: 0;
-  }
-  .profile-info { flex: 1; }
-  .profile-name { font-size: 20px; font-weight: 700; margin-bottom: 3px; }
-  .profile-sub { font-size: 12px; opacity: 0.85; }
-  .profile-badge {
-    background: rgba(255,255,255,0.25);
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 11px; font-weight: 600;
-    display: inline-flex; align-items: center; gap: 4px;
-  }
-  .profile-stats {
-    display: grid; grid-template-columns: repeat(3,1fr);
-    gap: 8px;
-  }
-  .stat-item {
-    background: rgba(255,255,255,0.2);
-    border-radius: var(--radius-xs);
-    padding: 8px;
-    text-align: center;
-    backdrop-filter: blur(4px);
-  }
-  .stat-value { font-size: 16px; font-weight: 700; }
-  .stat-label { font-size: 10px; opacity: 0.85; margin-top: 2px; }
+/* ========== SECTION HEADERS ========== */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 12px;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+.section-link {
+  font-size: 13px;
+  color: var(--primary);
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
 
-  /* Weather Card */
-  .weather-card {
-    background: var(--bg2);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 16px var(--shadow);
-    border: 1px solid var(--border);
-  }
-  .weather-header {
-    display: flex; justify-content: space-between;
-    align-items: center; margin-bottom: 12px;
-  }
-  .weather-location { font-size: 12px; color: var(--text-light); display: flex; align-items: center; gap: 4px; }
-  .weather-days { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .weather-day {
-    background: var(--bg);
-    border-radius: var(--radius-sm);
-    padding: 12px;
-    text-align: center;
-    position: relative;
-  }
-  .weather-day.today { border: 1.5px solid var(--primary-light); }
-  .weather-day-label { font-size: 11px; font-weight: 600; color: var(--text-light); margin-bottom: 6px; }
-  .weather-icon { font-size: 28px; margin-bottom: 4px; }
-  .weather-temp { font-size: 22px; font-weight: 700; color: var(--text); }
-  .weather-desc { font-size: 10px; color: var(--text-light); margin-top: 2px; }
-  .weather-badges { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
-  .weather-badge {
-    background: var(--accent);
-    border-radius: 20px;
-    padding: 2px 8px;
-    font-size: 10px;
-    color: var(--primary-dark);
-    font-weight: 500;
-  }
-  .today-label {
-    position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
-    background: var(--primary);
-    color: white; font-size: 9px; font-weight: 700;
-    padding: 1px 8px; border-radius: 0 0 8px 8px;
-  }
+/* ========== CARDS ========== */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
 
-  /* CTA Button */
-  .cta-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin-bottom: 16px;
-    box-shadow: 0 6px 20px rgba(255,143,171,0.4);
-    transition: all 0.2s;
-    font-family: 'Noto Sans KR', sans-serif;
-    letter-spacing: -0.3px;
-  }
-  .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(255,143,171,0.5); }
-  .cta-btn:active { transform: translateY(0); }
-  .cta-btn .btn-icon { font-size: 20px; }
+/* ========== HOME TAB ========== */
+.home-top {
+  padding: 24px 20px 0;
+}
+.home-greeting {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.3;
+}
+.home-greeting span { color: var(--primary); }
+.home-date {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-weight: 400;
+}
 
-  /* Quick Stats */
-  .quick-stats {
-    display: grid; grid-template-columns: repeat(3,1fr);
-    gap: 10px; margin-bottom: 16px;
-  }
-  .qs-card {
-    background: var(--bg2);
-    border-radius: var(--radius-sm);
-    padding: 14px 10px;
-    text-align: center;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 8px var(--shadow);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .qs-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px var(--shadow-md); }
-  .qs-emoji { font-size: 22px; margin-bottom: 4px; }
-  .qs-num { font-size: 18px; font-weight: 700; color: var(--primary-dark); }
-  .qs-label { font-size: 10px; color: var(--text-light); margin-top: 2px; font-weight: 500; }
+.profile-card {
+  margin: 16px 20px 0;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, #FFF0F5, #F5F0FF);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.profile-avatar {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--primary);
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(255,143,171,0.3);
+}
+.profile-avatar-placeholder {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+  flex-shrink: 0;
+  border: 3px solid var(--primary);
+}
+.profile-info .name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+.profile-info .meta {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-weight: 400;
+}
+.profile-stats {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.profile-stat {
+  background: white;
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  border: 1px solid var(--accent);
+}
 
-  /* Recent Outfit */
-  .recent-outfit {
-    background: var(--bg2);
-    border-radius: var(--radius);
-    padding: 16px;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 8px var(--shadow);
-    margin-bottom: 16px;
-  }
-  .recent-outfit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .see-all { font-size: 12px; color: var(--primary); font-weight: 600; cursor: pointer; }
-  .recent-items { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
-  .recent-item {
-    flex-shrink: 0;
-    width: 80px;
-    text-align: center;
-  }
-  .recent-item-img {
-    width: 80px; height: 80px;
-    border-radius: var(--radius-xs);
-    object-fit: cover;
-    margin-bottom: 6px;
-    border: 1px solid var(--border);
-  }
-  .recent-item-name { font-size: 10px; color: var(--text-light); }
+.weather-card {
+  margin: 14px 20px 0;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #E8F4FD, #D4E8F8);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid #C8DFF0;
+}
+.weather-icon-wrap {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.7);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.weather-main {
+  flex: 1;
+}
+.weather-city {
+  font-size: 13px;
+  color: #5B8DB0;
+  font-weight: 500;
+}
+.weather-temp {
+  font-size: 28px;
+  font-weight: 800;
+  color: #2A6090;
+  line-height: 1.1;
+}
+.weather-desc {
+  font-size: 12px;
+  color: #6CA0BC;
+  margin-top: 2px;
+}
+.weather-tomorrow {
+  text-align: right;
+}
+.weather-tomorrow .label {
+  font-size: 11px;
+  color: #7BAAC8;
+}
+.weather-tomorrow .temp {
+  font-size: 18px;
+  font-weight: 700;
+  color: #3A7AAA;
+}
 
-  /* Tips Banner */
-  .tips-banner {
-    background: linear-gradient(135deg, var(--secondary-light), var(--accent));
-    border-radius: var(--radius-sm);
-    padding: 14px;
-    display: flex; gap: 10px; align-items: flex-start;
-    margin-bottom: 16px;
-  }
-  .tips-icon { font-size: 20px; flex-shrink: 0; }
-  .tips-text { font-size: 12px; line-height: 1.5; color: var(--text); }
-  .tips-text strong { color: var(--primary-dark); }
+.cta-button {
+  margin: 16px 20px 0;
+  width: calc(100% - 40px);
+  padding: 18px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(255,143,171,0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: -0.3px;
+}
+.cta-button:active {
+  transform: scale(0.97);
+  box-shadow: 0 3px 12px rgba(255,143,171,0.3);
+}
 
-  /* ============================================================
-     SCREEN 2 — WARDROBE
-  ============================================================ */
-  .wardrobe-header {
-    display: flex; justify-content: space-between;
-    align-items: center; margin-bottom: 14px;
-  }
-  .add-btn {
-    width: 38px; height: 38px;
-    background: var(--primary);
-    color: white; border: none; border-radius: 50%;
-    font-size: 22px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 12px rgba(255,143,171,0.4);
-    transition: all 0.2s;
-  }
-  .add-btn:hover { transform: scale(1.1) rotate(90deg); background: var(--primary-dark); }
+.stats-row {
+  margin: 14px 20px 0;
+  display: flex;
+  gap: 10px;
+}
+.stat-card {
+  flex: 1;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 14px 10px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.stat-num {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-weight: 400;
+}
 
-  .cat-filter {
-    display: flex; gap: 6px;
-    overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px;
-    -ms-overflow-style: none; scrollbar-width: none;
-  }
-  .cat-filter::-webkit-scrollbar { display: none; }
-  .cat-pill {
-    flex-shrink: 0;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px; font-weight: 600;
-    border: 1.5px solid var(--border);
-    background: var(--bg2);
-    color: var(--text-light);
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .cat-pill.active {
-    background: var(--primary);
-    color: white; border-color: var(--primary);
-  }
-  .cat-pill:hover:not(.active) { border-color: var(--primary-light); color: var(--primary-dark); }
+/* ========== WARDROBE TAB ========== */
+.category-filters {
+  padding: 16px 20px 4px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.category-filters::-webkit-scrollbar { display: none; }
 
-  .clothes-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .cloth-card {
-    background: var(--bg2);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 10px var(--shadow);
-    transition: all 0.25s;
-    cursor: pointer;
-  }
-  .cloth-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px var(--shadow-md); }
-  .cloth-img-wrap {
-    position: relative;
-    padding-top: 100%;
-    overflow: hidden;
-  }
-  .cloth-img {
-    position: absolute; top: 0; left: 0;
-    width: 100%; height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s;
-  }
-  .cloth-card:hover .cloth-img { transform: scale(1.05); }
-  .cloth-img-placeholder {
-    position: absolute; top: 0; left: 0;
-    width: 100%; height: 100%;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    font-size: 32px;
-  }
-  .laundry-badge {
-    position: absolute; top: 8px; right: 8px;
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    transition: all 0.2s;
-    border: 2px solid white;
-  }
-  .laundry-badge.clean { background: var(--accent2); }
-  .laundry-badge.dirty { background: #FFE0B2; }
-  .laundry-badge:hover { transform: scale(1.15); }
-  .cloth-info { padding: 10px; }
-  .cloth-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
-  .cloth-tags { display: flex; gap: 4px; flex-wrap: wrap; }
-  .cloth-tag {
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 10px; font-weight: 500;
-  }
-  .tag-top { background: #FFE4E8; color: #D45A6A; }
-  .tag-bottom { background: #E4E8FF; color: #5A6AD4; }
-  .tag-dress { background: #FFE4FF; color: #C45AC4; }
-  .tag-outer { background: #E4F4FF; color: #5AA4C4; }
-  .tag-shoes { background: #FFFCE4; color: #C4B45A; }
-  .tag-acc { background: #E4FFE8; color: #5AC45A; }
+.filter-pill {
+  flex-shrink: 0;
+  padding: 7px 16px;
+  border-radius: 50px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.filter-pill.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgba(255,143,171,0.35);
+}
+.filter-pill:active { transform: scale(0.95); }
 
-  /* ============================================================
-     SCREEN 3 — OUTFIT RECOMMENDATION
-  ============================================================ */
-  .rec-weather-bar {
-    background: linear-gradient(135deg, #74B9FF, #0984E3);
-    border-radius: var(--radius-sm);
-    padding: 12px 16px;
-    color: white;
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 16px;
-  }
-  .rec-weather-emoji { font-size: 28px; }
-  .rec-weather-info { flex: 1; }
-  .rec-weather-temp { font-size: 20px; font-weight: 700; }
-  .rec-weather-desc { font-size: 11px; opacity: 0.9; }
-  .rec-weather-advice {
-    background: rgba(255,255,255,0.2);
-    border-radius: var(--radius-xs);
-    padding: 4px 10px;
-    font-size: 11px; font-weight: 600;
-  }
+.wardrobe-grid {
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
 
-  .ai-tag {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px; font-weight: 700;
-    margin-bottom: 12px;
-  }
-  .ai-tag svg { width: 12px; height: 12px; }
+.clothing-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  border: 2.5px solid transparent;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.clothing-card.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255,143,171,0.25), var(--shadow-md);
+  transform: scale(1.02);
+}
+.clothing-card:active { transform: scale(0.97); }
+.clothing-card.selected:active { transform: scale(0.99); }
 
-  /* Outfit Recommendation Cards */
-  .outfit-cards-row {
-    display: flex; gap: 8px;
-    overflow-x: auto; padding-bottom: 8px;
-    margin-bottom: 16px;
-    -ms-overflow-style: none; scrollbar-width: none;
-  }
-  .outfit-cards-row::-webkit-scrollbar { display: none; }
-  .outfit-rec-card {
-    flex-shrink: 0;
-    width: 100px;
-    background: var(--bg2);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 1.5px solid var(--border);
-    box-shadow: 0 2px 8px var(--shadow);
-    transition: all 0.2s;
-    cursor: pointer;
-  }
-  .outfit-rec-card:hover { transform: translateY(-2px); border-color: var(--primary-light); }
-  .outfit-rec-card.selected { border-color: var(--primary); }
-  .rec-card-img {
-    width: 100%; height: 80px;
-    object-fit: cover;
-    display: block;
-  }
-  .rec-card-img-ph {
-    width: 100%; height: 80px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px;
-  }
-  .rec-card-label { padding: 6px; font-size: 10px; font-weight: 600; color: var(--text); text-align: center; }
+.clothing-img-wrap {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #F8F0F4;
+  position: relative;
+  overflow: hidden;
+}
+.clothing-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+  display: block;
+}
+.clothing-card:active .clothing-img { transform: scale(1.04); }
 
-  /* Simulation */
-  .simulation-box {
-    background: var(--bg2);
-    border-radius: var(--radius);
-    padding: 16px;
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 16px var(--shadow);
-    margin-bottom: 16px;
-  }
-  .sim-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
-  .simulation-area {
-    position: relative;
-    height: 280px;
-    background: linear-gradient(180deg, #FFF0F8 0%, #F8F0FF 100%);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    margin-bottom: 14px;
-    display: flex; align-items: flex-end; justify-content: center;
-  }
-  .sim-bg-circle {
-    position: absolute;
-    top: 10px; left: 50%; transform: translateX(-50%);
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(255,214,231,0.5) 0%, transparent 70%);
-    border-radius: 50%;
-  }
+.clothing-img-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+  background: linear-gradient(135deg, #FFF0F5, #F0EBFF);
+}
 
-  /* SVG Silhouette */
-  .child-silhouette {
-    position: absolute;
-    bottom: 0; left: 50%;
-    transform: translateX(-50%);
-    width: 140px;
-  }
+.check-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,143,171,0.18);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.clothing-card.selected .check-overlay { opacity: 1; }
+.check-circle {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(255,143,171,0.5);
+}
 
-  /* Clothing overlays on silhouette */
-  .sim-clothing {
-    position: absolute;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
-    border: 2px solid white;
-    transition: all 0.3s;
-  }
-  .sim-clothing img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .sim-clothing-ph {
-    width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-  }
-  .sim-top { width: 60px; height: 55px; top: 70px; left: 50%; transform: translateX(-50%); }
-  .sim-bottom { width: 52px; height: 52px; top: 140px; left: 50%; transform: translateX(-50%); }
-  .sim-dress { width: 68px; height: 85px; top: 75px; left: 50%; transform: translateX(-50%); }
-  .sim-shoes { width: 42px; height: 30px; bottom: 8px; left: 50%; transform: translateX(-50%); border-radius: 20px; }
-  .sim-acc { width: 30px; height: 30px; top: 40px; left: 50%; transform: translateX(10px); border-radius: 50%; }
+.laundry-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.laundry-badge.clean {
+  background: rgba(181,234,215,0.95);
+  color: #2D8A5A;
+}
+.laundry-badge.dirty {
+  background: rgba(255,218,193,0.95);
+  color: #B05A2A;
+}
 
-  /* Sim Label */
-  .sim-item-label {
-    position: absolute;
-    background: rgba(255,255,255,0.9);
-    border-radius: 20px;
-    padding: 2px 8px;
-    font-size: 9px; font-weight: 600;
-    color: var(--text);
-    white-space: nowrap;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  }
-  .sim-label-top { top: 72px; right: 8px; }
-  .sim-label-bottom { top: 142px; right: 8px; }
-  .sim-label-shoes { bottom: 12px; right: 8px; }
-  .sim-label-acc { top: 42px; left: 8px; }
+.clothing-info {
+  padding: 10px 12px 12px;
+}
+.clothing-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.clothing-cat-badge {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--accent);
+  color: var(--primary-dark);
+}
 
-  .re-rec-btn {
-    width: 100%;
-    padding: 12px;
-    background: var(--bg);
-    border: 1.5px solid var(--primary);
-    color: var(--primary-dark);
-    border-radius: var(--radius-xs);
-    font-size: 14px; font-weight: 700;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    transition: all 0.2s;
-    font-family: 'Noto Sans KR', sans-serif;
-  }
-  .re-rec-btn:hover { background: var(--accent); transform: translateY(-1px); }
-  .re-rec-btn:active { transform: translateY(0); }
+.laundry-toggle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.15s;
+  z-index: 5;
+  -webkit-tap-highlight-color: transparent;
+}
+.laundry-toggle:active { transform: scale(0.88); }
 
-  /* Influencer */
-  .influencer-section { margin-top: 16px; }
-  .influencer-cards { display: flex; flex-direction: column; gap: 10px; }
-  .inf-card {
-    background: var(--bg2);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 10px var(--shadow);
-    display: flex;
-    transition: all 0.2s;
-    cursor: pointer;
-  }
-  .inf-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px var(--shadow-md); }
-  .inf-img {
-    width: 90px; height: 90px;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-  .inf-info { padding: 12px; flex: 1; }
-  .inf-style { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-  .inf-desc { font-size: 11px; color: var(--text-light); line-height: 1.4; margin-bottom: 8px; }
-  .inf-find-btn {
-    padding: 5px 12px;
-    background: var(--accent);
-    border: none; border-radius: 20px;
-    font-size: 11px; font-weight: 600;
-    color: var(--primary-dark);
-    cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
-    transition: all 0.2s;
-  }
-  .inf-find-btn:hover { background: var(--primary-light); }
+.selection-bottom-bar {
+  position: fixed;
+  bottom: var(--nav-h);
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  width: 100%;
+  max-width: 390px;
+  padding: 12px 20px;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  z-index: 150;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.selection-bottom-bar.visible {
+  transform: translateX(-50%) translateY(0);
+}
+.selection-go-btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, var(--primary), #FF6B95);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(255,143,171,0.4);
+  transition: transform 0.12s, box-shadow 0.12s;
+  letter-spacing: -0.2px;
+}
+.selection-go-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(255,143,171,0.3);
+}
 
-  /* ============================================================
-     SCREEN 4 — STYLE FEED
-  ============================================================ */
-  .occasion-filter {
-    display: flex; gap: 6px;
-    margin-bottom: 14px;
-    overflow-x: auto;
-    -ms-overflow-style: none; scrollbar-width: none;
-  }
-  .occasion-filter::-webkit-scrollbar { display: none; }
-  .occ-pill {
-    flex-shrink: 0;
-    padding: 7px 16px;
-    border-radius: 20px;
-    font-size: 12px; font-weight: 600;
-    border: 1.5px solid var(--border);
-    background: var(--bg2);
-    color: var(--text-light);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .occ-pill.active { background: var(--secondary); color: white; border-color: var(--secondary); }
-  .occ-pill:hover:not(.active) { border-color: var(--secondary-light); color: #7A5AC4; }
+.fab {
+  position: fixed;
+  bottom: calc(var(--nav-h) + 16px);
+  right: calc(50% - 190px + 16px);
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255,143,171,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 140;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.fab:active {
+  transform: scale(0.9);
+  box-shadow: 0 3px 10px rgba(255,143,171,0.3);
+}
+#wardrobeFab.pushed {
+  bottom: calc(var(--nav-h) + 80px);
+}
 
-  .feed-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .feed-card {
-    background: var(--bg2);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 8px var(--shadow);
-    transition: all 0.25s;
-    cursor: pointer;
-  }
-  .feed-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px var(--shadow-md); }
-  .feed-img-wrap { position: relative; }
-  .feed-img {
-    width: 100%; height: 160px;
-    object-fit: cover; display: block;
-  }
-  .feed-heart {
-    position: absolute; top: 8px; right: 8px;
-    width: 30px; height: 30px;
-    background: rgba(255,255,255,0.9);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    transition: all 0.2s;
-    border: none;
-  }
-  .feed-heart:hover { transform: scale(1.2); }
-  .feed-heart.liked { background: #FFE0E8; }
-  .occ-chip {
-    position: absolute; bottom: 8px; left: 8px;
-    background: rgba(255,255,255,0.92);
-    border-radius: 10px;
-    padding: 2px 8px;
-    font-size: 10px; font-weight: 600;
-    color: var(--text);
-    backdrop-filter: blur(4px);
-  }
-  .feed-body { padding: 10px; }
-  .feed-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
-  .feed-tag {
-    background: var(--accent);
-    color: var(--primary-dark);
-    padding: 2px 7px;
-    border-radius: 8px;
-    font-size: 10px; font-weight: 500;
-  }
-  .apply-btn {
-    width: 100%;
-    padding: 7px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white; border: none; border-radius: var(--radius-xs);
-    font-size: 11px; font-weight: 700;
-    cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
-    transition: all 0.2s;
-  }
-  .apply-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+/* ========== SIMULATION TAB ========== */
+.sim-weather-banner {
+  margin: 16px 20px 0;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #E8F4FD, #D4E8F8);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #3A7AAA;
+  font-weight: 500;
+  border: 1px solid #C8DFF0;
+}
 
-  /* ========== MODAL ========== */
-  .modal-overlay {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(74,63,74,0.5);
-    display: flex; align-items: flex-end;
-    z-index: 100;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.3s;
-    backdrop-filter: blur(2px);
-  }
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
-  .modal-sheet {
-    background: var(--bg2);
-    border-radius: var(--radius) var(--radius) 0 0;
-    padding: 20px;
-    width: 100%;
-    transform: translateY(100%);
-    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .modal-overlay.open .modal-sheet { transform: translateY(0); }
-  .modal-handle {
-    width: 40px; height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    margin: 0 auto 16px;
-  }
-  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
-  .modal-close {
-    float: right; background: none; border: none;
-    font-size: 18px; cursor: pointer; color: var(--text-light);
-    margin-top: -2px;
-  }
+.sim-photo-container {
+  margin: 14px 20px 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  background: #F8F0F4;
+  aspect-ratio: 380 / 520;
+  width: calc(100% - 40px);
+}
 
-  /* Toast */
-  .toast {
-    position: absolute;
-    bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: rgba(74,63,74,0.9);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-size: 13px; font-weight: 500;
-    white-space: nowrap;
-    opacity: 0;
-    transition: all 0.3s;
-    z-index: 200;
-    pointer-events: none;
-    backdrop-filter: blur(4px);
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* SHIMMER */
+.shimmer-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: linear-gradient(
+    105deg,
+    #F8F0F4 0%,
+    #F8F0F4 30%,
+    #FFE4EE 50%,
+    #F8F0F4 70%,
+    #F8F0F4 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerMove 0.9s ease-in-out infinite;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.shimmer-overlay.active {
+  opacity: 1;
+}
+@keyframes shimmerMove {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
-  /* Scrollbar */
-  .screen::-webkit-scrollbar { width: 3px; }
-  .screen::-webkit-scrollbar-track { background: transparent; }
-  .screen::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 2px; }
+/* The two crossfading images */
+.sim-photo-slot {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+}
+.sim-photo-slot img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.sim-photo-slot .photo-placeholder {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px;
+  font-size: 60px;
+  background: linear-gradient(135deg, #FFF0F5, #F0EBFF);
+}
+.sim-photo-slot .photo-placeholder span {
+  font-size: 15px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
 
-  /* Animations */
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
-  }
-  @keyframes shimmer {
-    0% { background-position: -200% center; }
-    100% { background-position: 200% center; }
-  }
-  .pulse { animation: pulse 2s ease-in-out infinite; }
-  .spin-once {
-    animation: spin 0.5s ease-in-out;
-  }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+/* slot A and slot B for crossfade */
+#slotA, #slotB {
+  transition: opacity 0.4s ease;
+}
+#slotA { opacity: 1; z-index: 2; }
+#slotB { opacity: 0; z-index: 1; }
+#slotA.hidden { opacity: 0; z-index: 1; }
+#slotB.visible { opacity: 1; z-index: 2; }
 
-  /* empty state */
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-light);
-  }
-  .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
-  .empty-state p { font-size: 14px; line-height: 1.5; }
+.sim-ai-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 8;
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  box-shadow: 0 2px 10px rgba(255,143,171,0.2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sim-outfit-name-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 8;
+  background: linear-gradient(transparent, rgba(0,0,0,0.55));
+  padding: 40px 16px 16px;
+}
+.sim-outfit-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+.sim-outfit-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+  margin-top: 3px;
+}
+
+/* Selected chips */
+.sim-chips-label {
+  padding: 14px 20px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.sim-chips {
+  padding: 0 20px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 36px;
+}
+.outfit-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: var(--card);
+  border: 1.5px solid var(--primary-light);
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 2px 6px rgba(255,143,171,0.12);
+  -webkit-tap-highlight-color: transparent;
+}
+.outfit-chip:hover { background: var(--accent); }
+.outfit-chip:active { transform: scale(0.93); }
+.outfit-chip .remove-x {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  color: white;
+  font-weight: 900;
+}
+
+.sim-actions {
+  padding: 14px 20px 0;
+  display: flex;
+  gap: 10px;
+}
+.sim-btn {
+  flex: 1;
+  padding: 13px 10px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.sim-btn:active { transform: scale(0.96); }
+.sim-btn-primary {
+  background: linear-gradient(135deg, var(--primary), #FF6B95);
+  color: white;
+  box-shadow: 0 4px 14px rgba(255,143,171,0.35);
+}
+.sim-btn-outline {
+  background: var(--card);
+  color: var(--primary);
+  border: 1.5px solid var(--primary-light);
+  box-shadow: var(--shadow);
+}
+
+.sim-influencer-section {
+  padding: 20px 20px 0;
+}
+.sim-influencer-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.sim-influencer-title::before,
+.sim-influencer-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.influencer-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.influencer-scroll::-webkit-scrollbar { display: none; }
+.influencer-card {
+  flex-shrink: 0;
+  width: 110px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.influencer-card img {
+  width: 110px; height: 130px;
+  object-fit: cover;
+  display: block;
+}
+.influencer-card .inf-label {
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========== FEED TAB ========== */
+.feed-filters {
+  padding: 16px 20px 4px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.feed-filters::-webkit-scrollbar { display: none; }
+
+.feed-grid {
+  padding: 12px 16px;
+  columns: 2;
+  column-gap: 12px;
+}
+.feed-item {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.feed-item img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+.feed-item-info {
+  padding: 10px 10px 12px;
+}
+.feed-item-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--accent);
+  color: var(--primary-dark);
+  margin-bottom: 5px;
+}
+.feed-item-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.feed-item-apply {
+  width: 100%;
+  margin-top: 8px;
+  padding: 7px;
+  background: var(--accent);
+  color: var(--primary-dark);
+  border: none;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.12s;
+}
+.feed-item-apply:active {
+  background: var(--primary-light);
+  transform: scale(0.96);
+}
+
+.heart-btn {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 5;
+}
+.heart-btn:active { transform: scale(0.82); }
+.heart-btn.liked { color: var(--primary); }
+.heart-btn:not(.liked) { color: #CCC; }
+
+/* ========== TOAST ========== */
+.toast {
+  position: fixed;
+  bottom: calc(var(--nav-h) + 16px);
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(45,45,45,0.94);
+  color: white;
+  padding: 11px 20px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ========== EMPTY STATE ========== */
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+.empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+.empty-state .msg { font-size: 15px; font-weight: 500; }
+.empty-state .sub { font-size: 13px; margin-top: 6px; font-weight: 400; }
+
+/* ========== SPACING ========== */
+.pb16 { padding-bottom: 16px; }
+.mb20 { margin-bottom: 20px; }
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- Status Bar -->
-  <div class="status-bar">
-    <span class="time">9:41</span>
-    <div class="status-icons">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.5 8.5a13 13 0 0121 0M5 12a10 10 0 0114 0M8.5 15.5a6 6 0 017 0M12 19h.01" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="16" height="10" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M22 11v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="4" y="9" width="10" height="6" rx="1" fill="currentColor"/></svg>
-    </div>
-  </div>
+  <!-- TAB CONTENT -->
+  <div class="tab-content">
 
-  <!-- App Header -->
-  <div class="app-header">
-    <div class="logo">
-      <div class="logo-icon">👗</div>
-      <div class="logo-text">코디맘</div>
-    </div>
-    <div class="header-actions">
-      <button class="icon-btn" onclick="showToast('알림이 없습니다')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
-      </button>
-      <button class="icon-btn" onclick="showToast('설정 페이지 준비 중')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      </button>
-    </div>
-  </div>
+    <!-- ===== HOME TAB ===== -->
+    <div class="tab-panel active" id="panel-home">
+      <div class="top-header">
+        <div class="logo">코디맘 👧</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="showToast('알림이 없어요 😊')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8FAB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </button>
+        </div>
+      </div>
 
-  <!-- Screens Container -->
-  <div class="screens-container">
-
-    <!-- SCREEN 1: HOME -->
-    <div class="screen active" id="screen-home">
+      <div class="home-top">
+        <div class="home-greeting">안녕하세요! 👋<br><span>지아</span>의 오늘 코디를 골라볼까요?</div>
+        <div class="home-date" id="homeDateEl">날짜 로딩중...</div>
+      </div>
 
       <!-- Profile Card -->
       <div class="profile-card">
-        <div class="profile-top">
-          <div class="avatar-wrap">
-            <svg width="40" height="44" viewBox="0 0 40 44" fill="none">
-              <!-- head -->
-              <circle cx="20" cy="11" r="9" fill="white" opacity="0.9"/>
-              <!-- hair -->
-              <ellipse cx="20" cy="5" rx="9" ry="5" fill="#FFB3C6"/>
-              <ellipse cx="12" cy="9" rx="3" ry="5" fill="#FFB3C6"/>
-              <ellipse cx="28" cy="9" rx="3" ry="5" fill="#FFB3C6"/>
-              <!-- hair accessories -->
-              <circle cx="13" cy="5" r="2.5" fill="#FF8FAB"/>
-              <circle cx="13" cy="5" r="1.5" fill="white"/>
-              <!-- face -->
-              <circle cx="17" cy="12" r="1.2" fill="#4A3F4A" opacity="0.7"/>
-              <circle cx="23" cy="12" r="1.2" fill="#4A3F4A" opacity="0.7"/>
-              <path d="M17.5 15.5 Q20 17.5 22.5 15.5" stroke="#FF8FAB" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-              <!-- cheeks -->
-              <circle cx="15" cy="14" r="2" fill="#FFB3C6" opacity="0.5"/>
-              <circle cx="25" cy="14" r="2" fill="#FFB3C6" opacity="0.5"/>
-              <!-- body / dress -->
-              <path d="M10 22 Q10 20 20 20 Q30 20 30 22 L32 40 Q20 44 8 40 Z" fill="#C9B8FF" opacity="0.9"/>
-              <!-- dress detail -->
-              <path d="M14 26 Q20 29 26 26" stroke="white" stroke-width="1" fill="none" opacity="0.6"/>
-              <!-- arms -->
-              <ellipse cx="8" cy="27" rx="3.5" ry="7" fill="#FFD6E7" opacity="0.9" transform="rotate(-10 8 27)"/>
-              <ellipse cx="32" cy="27" rx="3.5" ry="7" fill="#FFD6E7" opacity="0.9" transform="rotate(10 32 27)"/>
-              <!-- legs -->
-              <rect x="14" y="38" width="5" height="8" rx="2.5" fill="#FFD6E7" opacity="0.9"/>
-              <rect x="21" y="38" width="5" height="8" rx="2.5" fill="#FFD6E7" opacity="0.9"/>
-            </svg>
-          </div>
-          <div class="profile-info">
-            <div class="profile-name">김지아 👶</div>
-            <div class="profile-sub">만 3세 · 여아</div>
-            <div style="margin-top:6px;">
-              <span class="profile-badge">✨ 패셔니스타</span>
-            </div>
-          </div>
-        </div>
-        <div class="profile-stats">
-          <div class="stat-item">
-            <div class="stat-value">95cm</div>
-            <div class="stat-label">키</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">14kg</div>
-            <div class="stat-label">몸무게</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">사이즈 4T</div>
-            <div class="stat-label">옷 사이즈</div>
+        <img
+          class="profile-avatar"
+          src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=200&h=200&fit=crop&q=80"
+          alt="김지아"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        >
+        <div class="profile-avatar-placeholder" style="display:none;">👧</div>
+        <div class="profile-info">
+          <div class="name">김지아</div>
+          <div class="meta">만 3살 · 95cm · 14kg</div>
+          <div class="profile-stats">
+            <span class="profile-stat">사이즈 100</span>
+            <span class="profile-stat">봄/여름</span>
           </div>
         </div>
       </div>
 
-      <!-- Weather -->
-      <div class="section-title"><span class="dot"></span>오늘의 날씨</div>
+      <!-- Weather Card -->
       <div class="weather-card">
-        <div class="weather-header">
-          <span class="section-title" style="margin:0;font-size:14px;">날씨 현황</span>
-          <span class="weather-location">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            서울, 대한민국
-          </span>
+        <div class="weather-icon-wrap">
+          <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
+            <circle cx="28" cy="26" r="12" fill="#FFD93D"/>
+            <path d="M28 8V4M28 48v-4M10 26H6M50 26h-4M16.7 14.7l-2.8-2.8M41.3 39.3l-2.8-2.8M16.7 37.3l-2.8 2.8M41.3 14.7l-2.8 2.8" stroke="#FFD93D" stroke-width="2.5" stroke-linecap="round"/>
+            <rect x="16" y="36" width="36" height="10" rx="5" fill="#C8DFF0"/>
+            <rect x="12" y="42" width="34" height="10" rx="5" fill="#A8C8E8"/>
+          </svg>
         </div>
-        <div class="weather-days">
-          <div class="weather-day today">
-            <div class="today-label">오늘</div>
-            <div class="weather-day-label" style="margin-top:8px;">5월 26일 월</div>
-            <div class="weather-icon">⛅</div>
-            <div class="weather-temp">22°C</div>
-            <div class="weather-desc">구름 조금</div>
-            <div class="weather-badges">
-              <span class="weather-badge">습도 55%</span>
-              <span class="weather-badge">바람 2m/s</span>
-            </div>
-          </div>
-          <div class="weather-day">
-            <div class="weather-day-label">내일</div>
-            <div class="weather-icon">🌤️</div>
-            <div class="weather-temp">25°C</div>
-            <div class="weather-desc">맑음</div>
-            <div class="weather-badges">
-              <span class="weather-badge">습도 45%</span>
-              <span class="weather-badge">바람 1m/s</span>
-            </div>
-          </div>
+        <div class="weather-main">
+          <div class="weather-city">서울특별시</div>
+          <div class="weather-temp">22°C</div>
+          <div class="weather-desc">구름 조금, 나들이 좋은 날씨 ☀️</div>
+        </div>
+        <div class="weather-tomorrow">
+          <div class="label">내일</div>
+          <div class="temp">25°C</div>
+          <div style="font-size:18px;">🌤</div>
         </div>
       </div>
 
-      <!-- CTA -->
-      <button class="cta-btn pulse" onclick="goToTab(2)">
-        <span class="btn-icon">✨</span>
+      <!-- CTA Button -->
+      <button class="cta-button" onclick="switchTab('sim')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
         오늘의 코디 추천받기
-        <span>→</span>
       </button>
 
-      <!-- Quick Stats -->
-      <div class="section-title"><span class="dot"></span>옷장 현황</div>
-      <div class="quick-stats">
-        <div class="qs-card" onclick="goToTab(1)">
-          <div class="qs-emoji">👕</div>
-          <div class="qs-num" id="totalCount">9</div>
-          <div class="qs-label">전체 옷</div>
-        </div>
-        <div class="qs-card" onclick="goToTab(1)">
-          <div class="qs-emoji">✅</div>
-          <div class="qs-num" id="cleanCount">7</div>
-          <div class="qs-label">착용 가능</div>
-        </div>
-        <div class="qs-card" onclick="goToTab(1)">
-          <div class="qs-emoji">🧺</div>
-          <div class="qs-num" id="dirtyCount">2</div>
-          <div class="qs-label">세탁 필요</div>
-        </div>
+      <!-- Stats -->
+      <div class="section-header">
+        <div class="section-title">우리 지아 옷장 현황</div>
       </div>
-
-      <!-- Recent Outfits -->
-      <div class="recent-outfit">
-        <div class="recent-outfit-header">
-          <div class="section-title" style="margin:0;">최근 착용 코디</div>
-          <span class="see-all" onclick="goToTab(3)">피드 보기 →</span>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num">12</div>
+          <div class="stat-label">전체 옷</div>
         </div>
-        <div class="recent-items">
-          <div class="recent-item">
-            <img src="https://images.unsplash.com/photo-1620231109648-b5786f9b6930?w=160&h=160&fit=crop" class="recent-item-img" alt="코디1" onerror="this.style.display='none'">
-            <div class="recent-item-name">봄 나들이 룩</div>
-          </div>
-          <div class="recent-item">
-            <img src="https://images.unsplash.com/photo-1619627702476-4adba41b3d13?w=160&h=160&fit=crop" class="recent-item-img" alt="코디2" onerror="this.style.display='none'">
-            <div class="recent-item-name">어린이집 등원</div>
-          </div>
-          <div class="recent-item">
-            <img src="https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=160&h=160&fit=crop" class="recent-item-img" alt="코디3" onerror="this.style.display='none'">
-            <div class="recent-item-name">생일 파티룩</div>
-          </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:#2D8A5A;">9</div>
+          <div class="stat-label">깨끗한 옷</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--secondary);">5</div>
+          <div class="stat-label">코디 추천 횟수</div>
         </div>
       </div>
 
-      <!-- Tips -->
-      <div class="tips-banner">
-        <div class="tips-icon">💡</div>
-        <div class="tips-text">
-          <strong>코디맘 TIP!</strong><br>
-          오늘 22°C 구름 낀 날씨에는 얇은 가디건을 챙겨주세요. 일교차가 있을 수 있어요 🌿
+      <div class="section-header" style="margin-top:8px;">
+        <div class="section-title">이번 주 날씨 코디 팁</div>
+      </div>
+      <div style="margin: 0 20px 20px; padding: 16px; background: linear-gradient(135deg, #FFF0F5, #F5F0FF); border-radius: var(--radius); border: 1px solid var(--border);">
+        <div style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:8px;">🌸 봄 코디 포인트</div>
+        <div style="font-size:13px; color:var(--text-muted); line-height:1.7;">
+          • 낮 기온 22도, 얇은 레이어드 추천<br>
+          • 가디건 챙기면 등원 때 딱 좋아요<br>
+          • 미세먼지 나쁨 - 실외 활동 짧게!
+        </div>
+      </div>
+    </div><!-- /home panel -->
+
+    <!-- ===== WARDROBE TAB ===== -->
+    <div class="tab-panel" id="panel-wardrobe">
+      <div class="top-header">
+        <div class="logo">옷장 👗</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="showToast('정렬 기능 준비중이에요!')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8FAB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/>
+            </svg>
+          </button>
         </div>
       </div>
 
-    </div><!-- /screen-home -->
-
-
-    <!-- SCREEN 2: WARDROBE -->
-    <div class="screen" id="screen-wardrobe">
-
-      <div class="wardrobe-header">
-        <div class="section-title" style="margin:0;font-size:17px;"><span class="dot"></span>지아의 옷장</div>
-        <button class="add-btn" onclick="showToast('옷 추가 기능 준비 중! 🌸')">+</button>
+      <!-- Category Filters -->
+      <div class="category-filters" id="categoryFilters">
+        <button class="filter-pill active" data-cat="전체" onclick="filterWardrobe(this, '전체')">전체</button>
+        <button class="filter-pill" data-cat="상의" onclick="filterWardrobe(this, '상의')">상의</button>
+        <button class="filter-pill" data-cat="하의" onclick="filterWardrobe(this, '하의')">하의</button>
+        <button class="filter-pill" data-cat="원피스" onclick="filterWardrobe(this, '원피스')">원피스</button>
+        <button class="filter-pill" data-cat="아우터" onclick="filterWardrobe(this, '아우터')">아우터</button>
+        <button class="filter-pill" data-cat="신발" onclick="filterWardrobe(this, '신발')">신발</button>
+        <button class="filter-pill" data-cat="액세서리" onclick="filterWardrobe(this, '액세서리')">액세서리</button>
       </div>
 
-      <!-- Category Filter -->
-      <div class="cat-filter" id="catFilter">
-        <div class="cat-pill active" data-cat="전체" onclick="filterClothes(this,'전체')">전체 9</div>
-        <div class="cat-pill" data-cat="상의" onclick="filterClothes(this,'상의')">상의</div>
-        <div class="cat-pill" data-cat="하의" onclick="filterClothes(this,'하의')">하의</div>
-        <div class="cat-pill" data-cat="원피스" onclick="filterClothes(this,'원피스')">원피스</div>
-        <div class="cat-pill" data-cat="아우터" onclick="filterClothes(this,'아우터')">아우터</div>
-        <div class="cat-pill" data-cat="신발" onclick="filterClothes(this,'신발')">신발</div>
-        <div class="cat-pill" data-cat="액세서리" onclick="filterClothes(this,'액세서리')">액세서리</div>
+      <!-- Wardrobe Grid -->
+      <div class="wardrobe-grid" id="wardrobeGrid"></div>
+    </div><!-- /wardrobe panel -->
+
+    <!-- ===== SIMULATION TAB ===== -->
+    <div class="tab-panel" id="panel-sim">
+      <div class="top-header">
+        <div class="logo">코디 시뮬레이션 ✨</div>
       </div>
 
-      <!-- Clothes Grid -->
-      <div class="clothes-grid" id="clothesGrid">
-        <!-- generated by JS -->
+      <!-- Weather banner -->
+      <div class="sim-weather-banner">
+        <svg width="20" height="20" viewBox="0 0 64 64" fill="none">
+          <circle cx="28" cy="26" r="10" fill="#FFD93D"/>
+          <rect x="16" y="36" width="32" height="8" rx="4" fill="#C8DFF0"/>
+          <rect x="12" y="42" width="30" height="8" rx="4" fill="#A8C8E8"/>
+        </svg>
+        오늘 서울 22°C · 구름 조금 — 가디건 레이어드 추천!
       </div>
 
-    </div><!-- /screen-wardrobe -->
+      <!-- THE MAIN PHOTO -->
+      <div class="sim-photo-container" id="simPhotoContainer">
+        <!-- Shimmer overlay -->
+        <div class="shimmer-overlay" id="shimmerOverlay"></div>
 
-
-    <!-- SCREEN 3: OUTFIT RECOMMENDATION -->
-    <div class="screen" id="screen-rec">
-
-      <!-- Weather Bar -->
-      <div class="rec-weather-bar">
-        <div class="rec-weather-emoji">⛅</div>
-        <div class="rec-weather-info">
-          <div class="rec-weather-temp">22°C · 구름 조금</div>
-          <div class="rec-weather-desc">서울 · 오늘 5월 26일</div>
+        <!-- Slot A (front) -->
+        <div class="sim-photo-slot" id="slotA">
+          <img id="imgA" src="" alt="코디 사진" onerror="handleImgError(this)">
         </div>
-        <div class="rec-weather-advice">얇은 겉옷 추천</div>
-      </div>
-
-      <!-- AI Recommendation -->
-      <div class="ai-tag">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        AI 코디 추천
-      </div>
-
-      <div class="section-title" style="margin-bottom:8px;"><span class="dot"></span>오늘의 추천 아이템</div>
-      <div class="outfit-cards-row" id="recCardsRow">
-        <!-- generated by JS -->
-      </div>
-
-      <!-- Simulation -->
-      <div class="simulation-box">
-        <div class="sim-title">
-          🧸 시뮬레이션
-          <span style="font-size:11px;color:var(--text-light);font-weight:400;margin-left:auto;">가상 착장 미리보기</span>
+        <!-- Slot B (back) -->
+        <div class="sim-photo-slot" id="slotB">
+          <img id="imgB" src="" alt="코디 사진" onerror="handleImgError(this)">
         </div>
-        <div class="simulation-area" id="simulationArea">
-          <div class="sim-bg-circle"></div>
 
-          <!-- Child SVG Silhouette -->
-          <svg class="child-silhouette" viewBox="0 0 140 220" fill="none">
-            <!-- shadow -->
-            <ellipse cx="70" cy="215" rx="35" ry="5" fill="rgba(0,0,0,0.06)"/>
-            <!-- legs -->
-            <rect x="44" y="155" width="22" height="60" rx="11" fill="#FFD6E7"/>
-            <rect x="74" y="155" width="22" height="60" rx="11" fill="#FFD6E7"/>
-            <!-- shoes (placeholder colors, overlaid by sim-shoes) -->
-            <ellipse cx="55" cy="215" rx="14" ry="6" fill="#C9B8FF"/>
-            <ellipse cx="85" cy="215" rx="14" ry="6" fill="#C9B8FF"/>
-            <!-- body outline (dress shape) -->
-            <path d="M30 80 Q30 70 70 70 Q110 70 110 80 L118 160 Q70 170 22 160 Z" fill="#F8EEFF" stroke="#E8D8F8" stroke-width="1"/>
-            <!-- arms -->
-            <rect x="12" y="78" width="20" height="60" rx="10" fill="#FFD6E7"/>
-            <rect x="108" y="78" width="20" height="60" rx="10" fill="#FFD6E7"/>
-            <!-- neck -->
-            <rect x="60" y="52" width="20" height="22" rx="8" fill="#FFD6E7"/>
-            <!-- head -->
-            <circle cx="70" cy="38" r="34" fill="#FFD6E7"/>
-            <!-- hair back -->
-            <path d="M36 32 Q70 -8 104 32 Q104 8 70 4 Q36 8 36 32 Z" fill="#FFB3C6"/>
-            <!-- pigtail left -->
-            <ellipse cx="30" cy="35" rx="8" ry="14" fill="#FFB3C6" transform="rotate(-15 30 35)"/>
-            <!-- pigtail right -->
-            <ellipse cx="110" cy="35" rx="8" ry="14" fill="#FFB3C6" transform="rotate(15 110 35)"/>
-            <!-- hair bow left -->
-            <path d="M24 24 L30 18 L30 28 Z" fill="#FF8FAB"/>
-            <path d="M36 24 L30 18 L30 28 Z" fill="#FF8FAB"/>
-            <circle cx="30" cy="24" r="3" fill="#FF6B8A"/>
-            <!-- hair bow right -->
-            <path d="M104 24 L110 18 L110 28 Z" fill="#FF8FAB"/>
-            <path d="M116 24 L110 18 L110 28 Z" fill="#FF8FAB"/>
-            <circle cx="110" cy="24" r="3" fill="#FF6B8A"/>
-            <!-- eyes -->
-            <circle cx="57" cy="38" r="5" fill="white"/>
-            <circle cx="83" cy="38" r="5" fill="white"/>
-            <circle cx="58" cy="38" r="3" fill="#4A3F4A"/>
-            <circle cx="84" cy="38" r="3" fill="#4A3F4A"/>
-            <circle cx="59" cy="37" r="1" fill="white"/>
-            <circle cx="85" cy="37" r="1" fill="white"/>
-            <!-- eyelashes -->
-            <path d="M53 34 L52 31" stroke="#4A3F4A" stroke-width="1.2" stroke-linecap="round"/>
-            <path d="M57 33 L57 30" stroke="#4A3F4A" stroke-width="1.2" stroke-linecap="round"/>
-            <path d="M61 34 L62 31" stroke="#4A3F4A" stroke-width="1.2" stroke-linecap="round"/>
-            <path d="M79 34 L78 31" stroke="#4A3F4A" stroke-width="1.2" stroke-linecap="round"/>
-            <path d="M83 33 L83 30" stroke="#4A3F4A" stroke-width="1.2" stroke-linecap="round"/>
-            <path d="M87 34 L88 31" stroke="#4A3F4A" stroke-width="1.2" stroke-linecap="round"/>
-            <!-- cheeks -->
-            <circle cx="50" cy="44" r="7" fill="#FFB3C6" opacity="0.5"/>
-            <circle cx="90" cy="44" r="7" fill="#FFB3C6" opacity="0.5"/>
-            <!-- nose -->
-            <circle cx="70" cy="44" r="2" fill="#FFAAAA" opacity="0.6"/>
-            <!-- smile -->
-            <path d="M61 52 Q70 60 79 52" stroke="#FF8FAB" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- AI Badge -->
+        <div class="sim-ai-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E8607A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
           </svg>
-
-          <!-- Clothing overlays (positioned over silhouette) -->
-          <div class="sim-clothing sim-top" id="simTop">
-            <div class="sim-clothing-ph" id="simTopPh" style="background:#FFE4E8;">👕</div>
-          </div>
-          <div class="sim-clothing sim-bottom" id="simBottom">
-            <div class="sim-clothing-ph" id="simBottomPh" style="background:#E4E8FF;">👖</div>
-          </div>
-          <div class="sim-clothing sim-shoes" id="simShoes">
-            <div class="sim-clothing-ph" id="simShoesPh" style="background:#FFFCE4;font-size:14px;">👟</div>
-          </div>
-          <div class="sim-clothing sim-acc" id="simAcc" style="display:none;">
-            <div class="sim-clothing-ph" id="simAccPh" style="background:#E4FFE8;font-size:14px;">🎀</div>
-          </div>
-
-          <!-- Labels -->
-          <div class="sim-item-label sim-label-top" id="labelTop">상의</div>
-          <div class="sim-item-label sim-label-bottom" id="labelBottom">하의</div>
-          <div class="sim-item-label sim-label-shoes" id="labelShoes">신발</div>
+          AI 코디 추천
         </div>
 
-        <button class="re-rec-btn" onclick="rerec()">
-          <span id="rerecIcon">🔄</span> 다시 추천받기
+        <!-- Outfit name overlay -->
+        <div class="sim-outfit-name-overlay">
+          <div class="sim-outfit-name" id="simOutfitName">핑크 걸리시 코디</div>
+          <div class="sim-outfit-sub" id="simOutfitSub">봄 나들이 / 등원 추천</div>
+        </div>
+      </div>
+
+      <!-- Selected chips -->
+      <div class="sim-chips-label">선택한 옷</div>
+      <div class="sim-chips" id="simChips">
+        <span style="color:var(--text-muted); font-size:13px; padding: 6px 0;">아래에서 옷을 선택하거나 "다시 추천"을 눌러보세요</span>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="sim-actions">
+        <button class="sim-btn sim-btn-primary" onclick="shuffleOutfit()">
+          🔀 다시 추천
+        </button>
+        <button class="sim-btn sim-btn-outline" onclick="switchTab('wardrobe')">
+          👗 옷장에서 선택
         </button>
       </div>
 
-      <!-- Influencer Recommendations -->
-      <div class="influencer-section">
-        <div class="section-title"><span class="dot"></span>인플루언서 추천 스타일</div>
-        <div style="font-size:12px;color:var(--text-light);margin-bottom:12px;line-height:1.5;">
-          트렌디한 아이 패션 인플루언서들의 추천 코디를 참고해보세요!
+      <!-- Influencer section -->
+      <div class="sim-influencer-section">
+        <div class="sim-influencer-title">인플루언서 참고 코디</div>
+        <div class="influencer-scroll" id="influencerScroll"></div>
+      </div>
+
+      <div style="height:20px;"></div>
+    </div><!-- /sim panel -->
+
+    <!-- ===== FEED TAB ===== -->
+    <div class="tab-panel" id="panel-feed">
+      <div class="top-header">
+        <div class="logo">스타일 피드 💕</div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="showToast('검색 기능 준비중이에요!')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8FAB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </button>
         </div>
-        <div class="influencer-cards" id="influencerCards">
-          <!-- generated by JS -->
-        </div>
       </div>
 
-    </div><!-- /screen-rec -->
-
-
-    <!-- SCREEN 4: STYLE FEED -->
-    <div class="screen" id="screen-feed">
-
-      <div class="section-title"><span class="dot"></span>스타일 피드</div>
-      <div style="font-size:12px;color:var(--text-light);margin-bottom:12px;">인기 아이 코디 영감을 찾아보세요 ✨</div>
-
-      <div class="occasion-filter" id="occasionFilter">
-        <div class="occ-pill active" data-occ="전체" onclick="filterFeed(this,'전체')">전체</div>
-        <div class="occ-pill" data-occ="일상" onclick="filterFeed(this,'일상')">🌸 일상</div>
-        <div class="occ-pill" data-occ="등원" onclick="filterFeed(this,'등원')">🎒 등원</div>
-        <div class="occ-pill" data-occ="나들이" onclick="filterFeed(this,'나들이')">🌈 나들이</div>
-        <div class="occ-pill" data-occ="파티" onclick="filterFeed(this,'파티')">🎉 파티</div>
+      <div class="feed-filters" id="feedFilters">
+        <button class="filter-pill active" onclick="filterFeed(this, '전체')">전체</button>
+        <button class="filter-pill" onclick="filterFeed(this, '일상')">일상</button>
+        <button class="filter-pill" onclick="filterFeed(this, '등원')">등원</button>
+        <button class="filter-pill" onclick="filterFeed(this, '나들이')">나들이</button>
+        <button class="filter-pill" onclick="filterFeed(this, '파티')">파티</button>
       </div>
 
-      <div class="feed-grid" id="feedGrid">
-        <!-- generated by JS -->
-      </div>
+      <div class="feed-grid" id="feedGrid"></div>
+    </div><!-- /feed panel -->
 
-    </div><!-- /screen-feed -->
+  </div><!-- /tab-content -->
 
-  </div><!-- /screens-container -->
-
-  <!-- Bottom Navigation -->
-  <div class="bottom-nav">
-    <button class="nav-item active" id="nav-0" onclick="goToTab(0)">
-      <div class="nav-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
+      <div class="nav-icon nav-icon-bg">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF8FAB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
       </div>
       <span class="nav-label">홈</span>
     </button>
-    <button class="nav-item" id="nav-1" onclick="goToTab(1)">
+    <button class="nav-item" id="nav-wardrobe" onclick="switchTab('wardrobe')">
       <div class="nav-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="7" height="7" rx="1"/><rect x="9" y="3" width="13" height="7" rx="1"/><rect x="2" y="12" width="13" height="9" rx="1"/><rect x="17" y="12" width="5" height="9" rx="1"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CCC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/>
+        </svg>
+        <div class="nav-dot" id="wardrobeDot" style="display:none;"></div>
       </div>
       <span class="nav-label">옷장</span>
     </button>
-    <button class="nav-item" id="nav-2" onclick="goToTab(2)">
+    <button class="nav-item" id="nav-sim" onclick="switchTab('sim')">
       <div class="nav-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CCC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="5"/><path d="M3 21v-1a8 8 0 0116 0v1"/>
+        </svg>
       </div>
-      <span class="nav-label">코디추천</span>
+      <span class="nav-label">코디</span>
     </button>
-    <button class="nav-item" id="nav-3" onclick="goToTab(3)">
+    <button class="nav-item" id="nav-feed" onclick="switchTab('feed')">
       <div class="nav-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CCC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
       </div>
       <span class="nav-label">피드</span>
+    </button>
+  </nav>
+
+  <!-- Wardrobe FAB -->
+  <button class="fab" id="wardrobeFab" onclick="showToast('옷 추가 기능 준비중이에요! 📸')" style="display:none;">+</button>
+
+  <!-- Selection Bottom Bar -->
+  <div class="selection-bottom-bar" id="selectionBar">
+    <button class="selection-go-btn" onclick="goToSimFromWardrobe()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="5"/><path d="M3 21v-1a8 8 0 0116 0v1"/>
+      </svg>
+      <span id="selectionBarText">0개 선택됨 → 코디 시뮬레이션 보기</span>
     </button>
   </div>
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
-
-</div><!-- /app -->
+</div>
 
 <script>
-// ===================================================
-// DATA
-// ===================================================
-const clothes = [
+/* =====================================================
+   DATA: OUTFIT SETS
+   Each set: { id, name, sub, photoId, itemIds }
+   The photo transitions when outfit changes.
+   ===================================================== */
+const OUTFIT_SETS = [
   {
-    id: 1, name: '딸기 프린트 티셔츠', cat: '상의', clean: true, emoji: '🍓',
-    color: '#FFE4E8',
-    img: 'https://images.unsplash.com/photo-1558171813-4e7bc3f3d3e2?w=300&h=300&fit=crop'
+    id: 'casual',
+    name: '캐주얼 데일리 코디',
+    sub: '일상 / 편안한 외출',
+    photoId: '1476234251651-f353703a034d',
+    itemIds: ['item-floral-skirt', 'item-stripe-tee', 'item-white-sneakers', 'item-ribbon']
   },
   {
-    id: 2, name: '꽃무늬 원피스', cat: '원피스', clean: true, emoji: '🌸',
-    color: '#FFE4FF',
-    img: 'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=300&h=300&fit=crop'
+    id: 'pink-girly',
+    name: '핑크 걸리시 코디',
+    sub: '봄 나들이 / 등원 추천',
+    photoId: '1503454537195-1dcabb73ffb9',
+    itemIds: ['item-pink-dress', 'item-mary-jane', 'item-flower-clip']
   },
   {
-    id: 3, name: '핑크 데님 팬츠', cat: '하의', clean: false, emoji: '👖',
-    color: '#E4E8FF',
-    img: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=300&h=300&fit=crop'
+    id: 'denim-sporty',
+    name: '데님 스포티 코디',
+    sub: '활동적인 외출 / 놀이터',
+    photoId: '1515488042361-ee00e0ddd4e4',
+    itemIds: ['item-denim-pants', 'item-stripe-tee', 'item-white-sneakers']
   },
   {
-    id: 4, name: '라벤더 가디건', cat: '아우터', clean: true, emoji: '🧥',
-    color: '#EDE4FF',
-    img: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=300&h=300&fit=crop'
+    id: 'floral-spring',
+    name: '플로럴 봄 코디',
+    sub: '봄 나들이 / 가족 나들이',
+    photoId: '1518717758536-85ae29035b6d',
+    itemIds: ['item-green-jumpsuit', 'item-flower-clip', 'item-mary-jane']
   },
   {
-    id: 5, name: '하트 스니커즈', cat: '신발', clean: true, emoji: '👟',
-    color: '#FFFCE4',
-    img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=300&fit=crop'
+    id: 'party-dressy',
+    name: '파티 드레시 코디',
+    sub: '생일파티 / 특별한 날',
+    photoId: '1519689680058-324335c6d2a5',
+    itemIds: ['item-party-dress', 'item-mary-jane', 'item-flower-clip']
   },
   {
-    id: 6, name: '곰돌이 스웨터', cat: '상의', clean: true, emoji: '🐻',
-    color: '#FFF0E4',
-    img: 'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&h=300&fit=crop'
+    id: 'cozy-layered',
+    name: '코지 레이어드 코디',
+    sub: '쌀쌀한 날 / 등원',
+    photoId: '1516627145497-ae6968895b74',
+    itemIds: ['item-cardigan', 'item-lace-blouse', 'item-denim-pants', 'item-ribbon']
   },
   {
-    id: 7, name: '튤 스커트', cat: '하의', clean: true, emoji: '🩷',
-    color: '#FFE4EE',
-    img: 'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=300&h=300&fit=crop'
+    id: 'summer-playful',
+    name: '여름 플레이풀 코디',
+    sub: '더운 날 / 여름 나들이',
+    photoId: '1555252333-9f8e92e65df9',
+    itemIds: ['item-green-jumpsuit', 'item-white-sneakers', 'item-ribbon']
   },
   {
-    id: 8, name: '리본 머리핀 세트', cat: '액세서리', clean: true, emoji: '🎀',
-    color: '#E4FFE8',
-    img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop'
-  },
-  {
-    id: 9, name: '체리 레인코트', cat: '아우터', clean: false, emoji: '🍒',
-    color: '#E4F4FF',
-    img: 'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?w=300&h=300&fit=crop'
+    id: 'smart-casual',
+    name: '스마트 캐주얼 코디',
+    sub: '세련된 일상 / 문화 활동',
+    photoId: '1476234251651-f353703a034d',
+    itemIds: ['item-lace-blouse', 'item-floral-skirt', 'item-mary-jane', 'item-flower-clip']
   }
 ];
 
-const influencers = [
+/* =====================================================
+   DATA: CLOTHING ITEMS
+   ===================================================== */
+const CLOTHING_ITEMS = [
   {
-    name: '미니멀 봄 룩',
-    desc: '화이트 블라우스 + 파스텔 청치마 조합으로 깔끔하고 사랑스러운 봄 코디',
-    tags: ['파스텔', '봄룩', '미니멀'],
-    img: 'https://images.unsplash.com/photo-1620231109648-b5786f9b6930?w=180&h=120&fit=crop'
+    id: 'item-pink-dress',
+    name: '핑크 플리츠 원피스',
+    category: '원피스',
+    photoId: '1503454537195-1dcabb73ffb9',
+    emoji: '👗',
+    clean: true
   },
   {
-    name: '캐주얼 나들이 룩',
-    desc: '스트라이프 상의 + 데님 팬츠로 편하고 귀엽게! 나들이 필수 코디',
-    tags: ['캐주얼', '나들이', '데님'],
-    img: 'https://images.unsplash.com/photo-1619627702476-4adba41b3d13?w=180&h=120&fit=crop'
+    id: 'item-denim-pants',
+    name: '데님 팬츠',
+    category: '하의',
+    photoId: '1542291026-7eec264c27ff',
+    emoji: '👖',
+    clean: true
   },
   {
-    name: '파티 프린세스 룩',
-    desc: '핑크 튤 원피스 + 크라운 액세서리로 완성하는 파티 공주님 코디',
-    tags: ['파티', '원피스', '핑크'],
-    img: 'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=180&h=120&fit=crop'
+    id: 'item-lace-blouse',
+    name: '흰 레이스 블라우스',
+    category: '상의',
+    photoId: '1594938298603-37170c8be547',
+    emoji: '👚',
+    clean: true
+  },
+  {
+    id: 'item-stripe-tee',
+    name: '스트라이프 티셔츠',
+    category: '상의',
+    photoId: '1515488042361-ee00e0ddd4e4',
+    emoji: '👕',
+    clean: false
+  },
+  {
+    id: 'item-floral-skirt',
+    name: '플로럴 스커트',
+    category: '하의',
+    photoId: '1476234251651-f353703a034d',
+    emoji: '🌸',
+    clean: true
+  },
+  {
+    id: 'item-green-jumpsuit',
+    name: '연두 점프수트',
+    category: '원피스',
+    photoId: '1518717758536-85ae29035b6d',
+    emoji: '💚',
+    clean: true
+  },
+  {
+    id: 'item-party-dress',
+    name: '파티 드레스',
+    category: '원피스',
+    photoId: '1519689680058-324335c6d2a5',
+    emoji: '🎀',
+    clean: true
+  },
+  {
+    id: 'item-cardigan',
+    name: '니트 가디건',
+    category: '아우터',
+    photoId: '1516627145497-ae6968895b74',
+    emoji: '🧥',
+    clean: true
+  },
+  {
+    id: 'item-white-sneakers',
+    name: '운동화 (화이트)',
+    category: '신발',
+    photoId: '1555252333-9f8e92e65df9',
+    emoji: '👟',
+    clean: false
+  },
+  {
+    id: 'item-mary-jane',
+    name: '메리제인 슈즈',
+    category: '신발',
+    photoId: '1476234251651-f353703a034d',
+    emoji: '👞',
+    clean: true
+  },
+  {
+    id: 'item-ribbon',
+    name: '리본 헤어밴드',
+    category: '액세서리',
+    photoId: '1515488042361-ee00e0ddd4e4',
+    emoji: '🎀',
+    clean: true
+  },
+  {
+    id: 'item-flower-clip',
+    name: '꽃 클립 세트',
+    category: '액세서리',
+    photoId: '1518717758536-85ae29035b6d',
+    emoji: '🌼',
+    clean: true
   }
 ];
 
-const feedItems = [
+/* =====================================================
+   DATA: STYLE FEED
+   ===================================================== */
+const FEED_ITEMS = [
   {
-    id: 1, occ: '나들이', liked: false, tags: ['봄코디','파스텔','꽃무늬'],
-    img: 'https://images.unsplash.com/photo-1620231109648-b5786f9b6930?w=300&h=400&fit=crop'
+    id: 'f1', tag: '나들이', title: '봄 플로럴 룩으로 공원 나들이', tag_cat: '나들이',
+    photoId: '1518717758536-85ae29035b6d', height: 180,
+    outfitSetId: 'floral-spring'
   },
   {
-    id: 2, occ: '등원', liked: true, tags: ['편안함','스트라이프'],
-    img: 'https://images.unsplash.com/photo-1619627702476-4adba41b3d13?w=300&h=400&fit=crop'
+    id: 'f2', tag: '파티', title: '생일파티 드레시 코디', tag_cat: '파티',
+    photoId: '1519689680058-324335c6d2a5', height: 220,
+    outfitSetId: 'party-dressy'
   },
   {
-    id: 3, occ: '파티', liked: false, tags: ['원피스','핑크','파티'],
-    img: 'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=300&h=400&fit=crop'
+    id: 'f3', tag: '일상', title: '편안한 데님 캐주얼 룩', tag_cat: '일상',
+    photoId: '1515488042361-ee00e0ddd4e4', height: 190,
+    outfitSetId: 'denim-sporty'
   },
   {
-    id: 4, occ: '일상', liked: false, tags: ['캐주얼','베이직'],
-    img: 'https://images.unsplash.com/photo-1558171813-4e7bc3f3d3e2?w=300&h=400&fit=crop'
+    id: 'f4', tag: '등원', title: '핑크 원피스로 등원 완성!', tag_cat: '등원',
+    photoId: '1503454537195-1dcabb73ffb9', height: 200,
+    outfitSetId: 'pink-girly'
   },
   {
-    id: 5, occ: '나들이', liked: true, tags: ['아우터','레이어드'],
-    img: 'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?w=300&h=400&fit=crop'
+    id: 'f5', tag: '나들이', title: '여름 점프수트 여행 코디', tag_cat: '나들이',
+    photoId: '1555252333-9f8e92e65df9', height: 210,
+    outfitSetId: 'summer-playful'
   },
   {
-    id: 6, occ: '일상', liked: false, tags: ['미니멀','화이트'],
-    img: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=300&h=400&fit=crop'
+    id: 'f6', tag: '일상', title: '레이어드 가디건 가을 코디', tag_cat: '일상',
+    photoId: '1516627145497-ae6968895b74', height: 175,
+    outfitSetId: 'cozy-layered'
   },
   {
-    id: 7, occ: '파티', liked: false, tags: ['드레스','페미닌'],
-    img: 'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=300&h=400&fit=crop'
+    id: 'f7', tag: '나들이', title: '스트라이프 캐주얼 데이 아웃', tag_cat: '나들이',
+    photoId: '1476234251651-f353703a034d', height: 195,
+    outfitSetId: 'casual'
   },
   {
-    id: 8, occ: '등원', liked: false, tags: ['스포티','편안'],
-    img: 'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&h=400&fit=crop'
+    id: 'f8', tag: '등원', title: '레이스 블라우스 스마트 등원룩', tag_cat: '등원',
+    photoId: '1594938298603-37170c8be547', height: 185,
+    outfitSetId: 'smart-casual'
   }
 ];
 
-// ===================================================
-// STATE
-// ===================================================
-let currentTab = 0;
-let currentCat = '전체';
-let currentOcc = '전체';
-let currentRec = { top: null, bottom: null, outer: null, shoes: null, acc: null };
+/* =====================================================
+   STATE
+   ===================================================== */
+let currentTab = 'home';
+let selectedItemIds = new Set();
+let cleanStates = {};         // itemId -> boolean
+let likedFeedItems = new Set();
+let currentOutfitSet = null;  // the currently displayed outfit set
+let currentSlot = 'A';        // which slot is visible
 
-// ===================================================
-// INIT
-// ===================================================
-document.addEventListener('DOMContentLoaded', () => {
-  renderClothes();
-  renderRec();
-  renderInfluencers();
-  renderFeed();
-  updateStats();
-});
+// init clean states from data
+CLOTHING_ITEMS.forEach(item => { cleanStates[item.id] = item.clean; });
 
-// ===================================================
-// TAB NAVIGATION
-// ===================================================
-const screenIds = ['screen-home', 'screen-wardrobe', 'screen-rec', 'screen-feed'];
+/* =====================================================
+   TAB SWITCHING
+   ===================================================== */
+function switchTab(tab) {
+  // hide all panels
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-icon').forEach(n => n.classList.remove('nav-icon-bg'));
 
-function goToTab(idx) {
-  if (idx === currentTab) return;
-  const prevScreen = document.getElementById(screenIds[currentTab]);
-  const nextScreen = document.getElementById(screenIds[idx]);
+  currentTab = tab;
+  document.getElementById('panel-' + (tab === 'wardrobe' ? 'wardrobe' : tab === 'sim' ? 'sim' : tab === 'feed' ? 'feed' : 'home')).classList.add('active');
 
-  prevScreen.classList.add(idx > currentTab ? 'exit-left' : '');
-  prevScreen.classList.remove('active');
-
-  setTimeout(() => {
-    prevScreen.classList.remove('exit-left');
-  }, 350);
-
-  nextScreen.style.transform = idx > currentTab ? 'translateX(30px)' : 'translateX(-30px)';
-  nextScreen.style.opacity = '0';
-  nextScreen.classList.add('active');
-
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      nextScreen.style.transform = 'translateX(0)';
-      nextScreen.style.opacity = '1';
+  const navEl = document.getElementById('nav-' + tab);
+  if (navEl) {
+    navEl.classList.add('active');
+    const iconEl = navEl.querySelector('.nav-icon');
+    if (iconEl) iconEl.classList.add('nav-icon-bg');
+    // update stroke colors
+    navEl.querySelectorAll('svg').forEach(svg => {
+      svg.querySelectorAll('[stroke]').forEach(el => { if (el.getAttribute('stroke') !== 'none') el.setAttribute('stroke', '#FF8FAB'); });
     });
+  }
+
+  // reset other nav icons to grey
+  ['home','wardrobe','sim','feed'].forEach(t => {
+    if (t === tab) return;
+    const n = document.getElementById('nav-' + t);
+    if (n) {
+      n.querySelectorAll('svg').forEach(svg => {
+        svg.querySelectorAll('[stroke]').forEach(el => { if (el.getAttribute('stroke') !== 'none') el.setAttribute('stroke', '#CCC'); });
+      });
+    }
   });
 
-  // Update nav
-  document.getElementById('nav-' + currentTab).classList.remove('active');
-  document.getElementById('nav-' + idx).classList.add('active');
-  currentTab = idx;
+  // Show/hide FAB for wardrobe
+  const fab = document.getElementById('wardrobeFab');
+  if (tab === 'wardrobe') {
+    fab.style.display = 'flex';
+  } else {
+    fab.style.display = 'none';
+  }
+
+  // scroll to top
+  document.querySelector('.tab-content').scrollTop = 0;
 }
 
-// ===================================================
-// CLOTHES RENDERING
-// ===================================================
-function getCatClass(cat) {
-  const map = { '상의':'tag-top','하의':'tag-bottom','원피스':'tag-dress','아우터':'tag-outer','신발':'tag-shoes','액세서리':'tag-acc' };
-  return map[cat] || 'tag-top';
-}
+/* =====================================================
+   WARDROBE RENDERING
+   ===================================================== */
+function renderWardrobe(filterCat) {
+  const grid = document.getElementById('wardrobeGrid');
+  const items = filterCat === '전체' ? CLOTHING_ITEMS : CLOTHING_ITEMS.filter(i => i.category === filterCat);
 
-function renderClothes(cat) {
-  const grid = document.getElementById('clothesGrid');
-  const filtered = (!cat || cat === '전체') ? clothes : clothes.filter(c => c.cat === cat);
-
-  if (filtered.length === 0) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👗</div><p>해당 카테고리에 옷이 없어요</p></div>';
+  if (items.length === 0) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="emoji">👗</div><div class="msg">해당 카테고리가 없어요</div><div class="sub">다른 카테고리를 선택해보세요</div></div>';
     return;
   }
 
-  grid.innerHTML = filtered.map(item => `
-    <div class="cloth-card" id="cloth-${item.id}">
-      <div class="cloth-img-wrap">
-        <img src="${item.img}" class="cloth-img" alt="${item.name}" onerror="this.style.display='none';document.getElementById('ph-${item.id}').style.display='flex'">
-        <div class="cloth-img-placeholder" id="ph-${item.id}" style="background:${item.color};display:none;">
-          <div style="font-size:36px">${item.emoji}</div>
+  grid.innerHTML = items.map(item => {
+    const isSelected = selectedItemIds.has(item.id);
+    const isClean = cleanStates[item.id];
+    return `
+      <div class="clothing-card ${isSelected ? 'selected' : ''}" id="card-${item.id}" onclick="toggleItemSelect('${item.id}')">
+        <div class="clothing-img-wrap">
+          <img
+            class="clothing-img"
+            src="https://images.unsplash.com/photo-${item.photoId}?w=200&h=200&fit=crop&q=80"
+            alt="${item.name}"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            loading="lazy"
+          >
+          <div class="clothing-img-placeholder" style="display:none;">${item.emoji}</div>
+          <div class="check-overlay">
+            <div class="check-circle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </div>
+          <div class="laundry-badge ${isClean ? 'clean' : 'dirty'}" id="badge-${item.id}">
+            ${isClean ? '✓ 깨끗' : '🧺 빨래'}
+          </div>
+          <button class="laundry-toggle" onclick="toggleLaundry(event, '${item.id}')" title="세탁 상태 변경">
+            ${isClean ? '✓' : '🧺'}
+          </button>
         </div>
-        <div class="laundry-badge ${item.clean ? 'clean' : 'dirty'}" id="badge-${item.id}" onclick="toggleLaundry(event,${item.id})" title="${item.clean ? '세탁완료' : '세탁필요'}">
-          ${item.clean ? '✓' : '🧺'}
+        <div class="clothing-info">
+          <div class="clothing-name">${item.name}</div>
+          <span class="clothing-cat-badge">${item.category}</span>
         </div>
       </div>
-      <div class="cloth-info">
-        <div class="cloth-name">${item.name}</div>
-        <div class="cloth-tags">
-          <span class="cloth-tag ${getCatClass(item.cat)}">${item.cat}</span>
-          ${item.clean ? '<span class="cloth-tag" style="background:#E8F5E9;color:#2E7D32;">착용가능</span>' : '<span class="cloth-tag" style="background:#FFF3E0;color:#E65100;">세탁필요</span>'}
-        </div>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
-function filterClothes(el, cat) {
-  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  currentCat = cat;
-  renderClothes(cat);
+function filterWardrobe(btn, cat) {
+  document.querySelectorAll('#categoryFilters .filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderWardrobe(cat);
 }
 
-function toggleLaundry(e, id) {
-  e.stopPropagation();
-  const item = clothes.find(c => c.id === id);
-  if (!item) return;
-  item.clean = !item.clean;
-  const badge = document.getElementById('badge-' + id);
+function toggleItemSelect(itemId) {
+  if (selectedItemIds.has(itemId)) {
+    selectedItemIds.delete(itemId);
+  } else {
+    selectedItemIds.add(itemId);
+  }
+  // Update card UI
+  const card = document.getElementById('card-' + itemId);
+  if (card) {
+    card.classList.toggle('selected', selectedItemIds.has(itemId));
+  }
+  updateSelectionBar();
+  // update dot on nav
+  document.getElementById('wardrobeDot').style.display = selectedItemIds.size > 0 ? 'block' : 'none';
+}
+
+function toggleLaundry(event, itemId) {
+  event.stopPropagation();
+  cleanStates[itemId] = !cleanStates[itemId];
+  // Re-render only that card's badges
+  const badge = document.getElementById('badge-' + itemId);
+  const toggle = document.querySelector(`#card-${itemId} .laundry-toggle`);
+  const isClean = cleanStates[itemId];
   if (badge) {
-    badge.className = 'laundry-badge ' + (item.clean ? 'clean' : 'dirty');
-    badge.textContent = item.clean ? '✓' : '🧺';
+    badge.className = 'laundry-badge ' + (isClean ? 'clean' : 'dirty');
+    badge.innerHTML = isClean ? '✓ 깨끗' : '🧺 빨래';
   }
-  // re-render tags
-  renderClothes(currentCat === '전체' ? null : currentCat);
-  updateStats();
-  showToast(item.clean ? `${item.name} 세탁 완료 처리! ✅` : `${item.name} 세탁 필요 표시 🧺`);
+  if (toggle) toggle.textContent = isClean ? '✓' : '🧺';
+  showToast(isClean ? '깨끗한 옷으로 표시했어요 ✓' : '빨래 예정으로 표시했어요 🧺');
 }
 
-function updateStats() {
-  const clean = clothes.filter(c => c.clean).length;
-  const dirty = clothes.filter(c => !c.clean).length;
-  document.getElementById('totalCount').textContent = clothes.length;
-  document.getElementById('cleanCount').textContent = clean;
-  document.getElementById('dirtyCount').textContent = dirty;
-}
-
-// ===================================================
-// RECOMMENDATION
-// ===================================================
-function pickRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function renderRec() {
-  const cleanClothes = clothes.filter(c => c.clean);
-  const tops = cleanClothes.filter(c => c.cat === '상의');
-  const bottoms = cleanClothes.filter(c => c.cat === '하의');
-  const dresses = cleanClothes.filter(c => c.cat === '원피스');
-  const shoes = cleanClothes.filter(c => c.cat === '신발');
-  const accs = cleanClothes.filter(c => c.cat === '액세서리');
-
-  // Pick an outfit
-  const useDress = dresses.length > 0 && Math.random() > 0.5;
-  const recItems = [];
-
-  if (useDress) {
-    const dress = pickRandom(dresses);
-    currentRec.dress = dress;
-    currentRec.top = null;
-    currentRec.bottom = null;
-    recItems.push({ ...dress, role: 'dress' });
+function updateSelectionBar() {
+  const bar = document.getElementById('selectionBar');
+  const text = document.getElementById('selectionBarText');
+  const fab = document.getElementById('wardrobeFab');
+  if (selectedItemIds.size > 0) {
+    bar.classList.add('visible');
+    text.textContent = `${selectedItemIds.size}개 선택됨 → 코디 시뮬레이션 보기`;
+    if (fab) fab.classList.add('pushed');
   } else {
-    const top = tops.length > 0 ? pickRandom(tops) : null;
-    const bottom = bottoms.length > 0 ? pickRandom(bottoms) : null;
-    if (top) { currentRec.top = top; recItems.push({ ...top, role: 'top' }); }
-    if (bottom) { currentRec.bottom = bottom; recItems.push({ ...bottom, role: 'bottom' }); }
-    currentRec.dress = null;
+    bar.classList.remove('visible');
+    if (fab) fab.classList.remove('pushed');
+  }
+}
+
+function goToSimFromWardrobe() {
+  switchTab('sim');
+  updateSimulation();
+}
+
+/* =====================================================
+   SIMULATION LOGIC (THE MAIN FEATURE)
+   ===================================================== */
+function unsplashUrl(photoId, w, h) {
+  return `https://images.unsplash.com/photo-${photoId}?w=${w}&h=${h}&fit=crop&q=80`;
+}
+
+// Find best matching outfit set for the selected items
+function findBestOutfitSet(selectedIds) {
+  if (selectedIds.size === 0) {
+    // return random
+    return OUTFIT_SETS[Math.floor(Math.random() * OUTFIT_SETS.length)];
   }
 
-  const shoe = shoes.length > 0 ? pickRandom(shoes) : null;
-  if (shoe) { currentRec.shoes = shoe; recItems.push({ ...shoe, role: 'shoes' }); }
+  let bestSet = null;
+  let bestScore = -1;
 
-  const acc = accs.length > 0 ? pickRandom(accs) : null;
-  if (acc) { currentRec.acc = acc; recItems.push({ ...acc, role: 'acc' }); }
-
-  // Render cards row
-  const row = document.getElementById('recCardsRow');
-  row.innerHTML = recItems.map(item => `
-    <div class="outfit-rec-card selected">
-      <img src="${item.img}" class="rec-card-img" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="rec-card-img-ph" style="background:${item.color};display:none;">${item.emoji}</div>
-      <div class="rec-card-label">${item.name}</div>
-    </div>
-  `).join('');
-
-  // Update simulation
-  updateSimulation(useDress, currentRec);
-}
-
-function updateSimulation(useDress, rec) {
-  const simTop = document.getElementById('simTop');
-  const simBottom = document.getElementById('simBottom');
-  const simTopPh = document.getElementById('simTopPh');
-  const simBottomPh = document.getElementById('simBottomPh');
-  const simShoesPh = document.getElementById('simShoesPh');
-  const simAccEl = document.getElementById('simAcc');
-  const simAccPh = document.getElementById('simAccPh');
-  const labelTop = document.getElementById('labelTop');
-  const labelBottom = document.getElementById('labelBottom');
-  const labelShoes = document.getElementById('labelShoes');
-
-  if (useDress && rec.dress) {
-    // Show dress in top position, hide bottom
-    simTop.style.width = '68px';
-    simTop.style.height = '85px';
-    simTop.style.top = '75px';
-    simTopPh.style.background = rec.dress.color;
-    simTopPh.style.fontSize = '24px';
-    simTopPh.textContent = rec.dress.emoji;
-    simTopPh.style.display = 'flex';
-    labelTop.textContent = rec.dress.name.length > 6 ? rec.dress.name.substring(0,6)+'...' : rec.dress.name;
-    simBottom.style.display = 'none';
-    labelBottom.style.display = 'none';
-  } else {
-    simTop.style.width = '60px';
-    simTop.style.height = '55px';
-    simTop.style.top = '70px';
-    simBottom.style.display = 'flex';
-    labelBottom.style.display = 'flex';
-    if (rec.top) {
-      simTopPh.style.background = rec.top.color;
-      simTopPh.textContent = rec.top.emoji;
-      simTopPh.style.display = 'flex';
-      labelTop.textContent = rec.top.name.length > 6 ? rec.top.name.substring(0,6)+'...' : rec.top.name;
+  OUTFIT_SETS.forEach(set => {
+    let score = 0;
+    selectedIds.forEach(id => {
+      if (set.itemIds.includes(id)) score++;
+    });
+    if (score > bestScore) {
+      bestScore = score;
+      bestSet = set;
     }
-    if (rec.bottom) {
-      simBottomPh.style.background = rec.bottom.color;
-      simBottomPh.textContent = rec.bottom.emoji;
-      simBottomPh.style.display = 'flex';
-      labelBottom.textContent = rec.bottom.name.length > 6 ? rec.bottom.name.substring(0,6)+'...' : rec.bottom.name;
-    }
-  }
+  });
 
-  if (rec.shoes) {
-    simShoesPh.style.background = rec.shoes.color;
-    simShoesPh.textContent = rec.shoes.emoji;
-    labelShoes.textContent = rec.shoes.name.length > 5 ? rec.shoes.name.substring(0,5)+'...' : rec.shoes.name;
-  }
-
-  if (rec.acc) {
-    simAccEl.style.display = 'flex';
-    simAccPh.style.background = rec.acc.color;
-    simAccPh.textContent = rec.acc.emoji;
-  } else {
-    simAccEl.style.display = 'none';
-  }
+  return bestSet || OUTFIT_SETS[0];
 }
 
-function rerec() {
-  const icon = document.getElementById('rerecIcon');
-  icon.classList.add('spin-once');
-  setTimeout(() => icon.classList.remove('spin-once'), 500);
-  showToast('새로운 코디를 추천중이에요! ✨');
-  renderRec();
-}
+// Crossfade photo transition with shimmer
+function transitionToOutfit(outfitSet, isInitial) {
+  const shimmer = document.getElementById('shimmerOverlay');
+  const slotA = document.getElementById('slotA');
+  const slotB = document.getElementById('slotB');
+  const imgA = document.getElementById('imgA');
+  const imgB = document.getElementById('imgB');
+  const nameEl = document.getElementById('simOutfitName');
+  const subEl = document.getElementById('simOutfitSub');
 
-// ===================================================
-// INFLUENCERS
-// ===================================================
-function renderInfluencers() {
-  const container = document.getElementById('influencerCards');
-  container.innerHTML = influencers.map(inf => `
-    <div class="inf-card">
-      <img src="${inf.img}" class="inf-img" alt="${inf.name}" onerror="this.style.background='${randomPastel()}';this.style.display='block';">
-      <div class="inf-info">
-        <div class="inf-style">${inf.name}</div>
-        <div class="inf-desc">${inf.desc}</div>
-        <button class="inf-find-btn" onclick="showToast('비슷한 옷 찾는 중... 🔍')">비슷한 옷 찾기</button>
-      </div>
-    </div>
-  `).join('');
-}
+  const newUrl = unsplashUrl(outfitSet.photoId, 380, 520);
 
-// ===================================================
-// FEED
-// ===================================================
-const occLabels = { '일상':'일상', '등원':'등원', '나들이':'나들이', '파티':'파티' };
-
-function renderFeed(occ) {
-  const grid = document.getElementById('feedGrid');
-  const filtered = (!occ || occ === '전체') ? feedItems : feedItems.filter(f => f.occ === occ);
-
-  if (filtered.length === 0) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📷</div><p>해당 카테고리 피드가 없어요</p></div>';
+  if (isInitial) {
+    // No transition, just set
+    imgA.src = newUrl;
+    slotA.classList.remove('hidden');
+    slotB.classList.remove('visible');
+    currentSlot = 'A';
+    nameEl.textContent = outfitSet.name;
+    subEl.textContent = outfitSet.sub;
+    currentOutfitSet = outfitSet;
     return;
   }
 
-  grid.innerHTML = filtered.map(item => `
-    <div class="feed-card">
-      <div class="feed-img-wrap">
-        <img src="${item.img}" class="feed-img" alt="${item.occ}" onerror="this.style.background='${randomPastel()}';this.style.minHeight='160px'">
-        <button class="feed-heart ${item.liked ? 'liked' : ''}" id="heart-${item.id}" onclick="toggleLike(event,${item.id})">
-          ${item.liked ? '❤️' : '🤍'}
-        </button>
-        <div class="occ-chip">${occLabels[item.occ] || item.occ}</div>
+  // 1) Show shimmer for 500ms
+  shimmer.classList.add('active');
+
+  setTimeout(() => {
+    // 2) Load new image into the back slot
+    const backImg = currentSlot === 'A' ? imgB : imgA;
+    const frontSlot = currentSlot === 'A' ? slotA : slotB;
+    const backSlot = currentSlot === 'A' ? slotB : slotA;
+
+    backImg.src = newUrl;
+    backImg.onload = () => {
+      // 3) Hide shimmer, crossfade
+      shimmer.classList.remove('active');
+
+      // Bring back slot to front
+      if (currentSlot === 'A') {
+        slotA.classList.add('hidden');
+        slotB.classList.add('visible');
+        currentSlot = 'B';
+      } else {
+        slotB.classList.remove('visible');
+        slotA.classList.remove('hidden');
+        currentSlot = 'A';
+      }
+
+      nameEl.textContent = outfitSet.name;
+      subEl.textContent = outfitSet.sub;
+      currentOutfitSet = outfitSet;
+    };
+    backImg.onerror = () => {
+      shimmer.classList.remove('active');
+      handleImgError(backImg);
+    };
+  }, 500);
+}
+
+function updateSimulation() {
+  const bestSet = findBestOutfitSet(selectedItemIds);
+  renderSimChips();
+  transitionToOutfit(bestSet, false);
+}
+
+function renderSimChips() {
+  const container = document.getElementById('simChips');
+  if (selectedItemIds.size === 0) {
+    container.innerHTML = '<span style="color:var(--text-muted); font-size:13px; padding:6px 0;">옷을 선택하거나 "다시 추천"을 눌러보세요</span>';
+    return;
+  }
+
+  const chips = Array.from(selectedItemIds).map(id => {
+    const item = CLOTHING_ITEMS.find(c => c.id === id);
+    if (!item) return '';
+    return `
+      <div class="outfit-chip" onclick="removeChip('${id}')">
+        ${item.emoji} ${item.name}
+        <div class="remove-x">✕</div>
       </div>
-      <div class="feed-body">
-        <div class="feed-tags">
-          ${item.tags.map(t => `<span class="feed-tag">#${t}</span>`).join('')}
-        </div>
-        <button class="apply-btn" onclick="showToast('내 아이에게 적용 준비 중! 🌟')">
-          내 아이에게 적용
-        </button>
-      </div>
+    `;
+  }).join('');
+  container.innerHTML = chips;
+}
+
+function removeChip(itemId) {
+  selectedItemIds.delete(itemId);
+  // Update wardrobe card if visible
+  const card = document.getElementById('card-' + itemId);
+  if (card) card.classList.remove('selected');
+  updateSelectionBar();
+  document.getElementById('wardrobeDot').style.display = selectedItemIds.size > 0 ? 'block' : 'none';
+  renderSimChips();
+  // recalculate best set
+  const bestSet = findBestOutfitSet(selectedItemIds);
+  transitionToOutfit(bestSet, false);
+}
+
+function shuffleOutfit() {
+  // pick a random set different from current
+  let candidates = OUTFIT_SETS.filter(s => !currentOutfitSet || s.id !== currentOutfitSet.id);
+  if (candidates.length === 0) candidates = OUTFIT_SETS;
+  const next = candidates[Math.floor(Math.random() * candidates.length)];
+  // Also update selected items to match the new outfit
+  selectedItemIds.clear();
+  next.itemIds.forEach(id => selectedItemIds.add(id));
+  // update wardrobe cards if visible
+  document.querySelectorAll('.clothing-card').forEach(card => card.classList.remove('selected'));
+  Array.from(selectedItemIds).forEach(id => {
+    const card = document.getElementById('card-' + id);
+    if (card) card.classList.add('selected');
+  });
+  updateSelectionBar();
+  document.getElementById('wardrobeDot').style.display = selectedItemIds.size > 0 ? 'block' : 'none';
+  renderSimChips();
+  transitionToOutfit(next, false);
+}
+
+function handleImgError(img) {
+  const wrap = img.parentElement;
+  if (!wrap) return;
+  img.style.display = 'none';
+  let placeholder = wrap.querySelector('.photo-placeholder');
+  if (!placeholder) {
+    placeholder = document.createElement('div');
+    placeholder.className = 'photo-placeholder';
+    placeholder.innerHTML = '<span>👧</span><span>사진 없음</span>';
+    wrap.appendChild(placeholder);
+  }
+  placeholder.style.display = 'flex';
+}
+
+/* =====================================================
+   INFLUENCER CARDS
+   ===================================================== */
+function renderInfluencerCards() {
+  const scroll = document.getElementById('influencerScroll');
+  const infData = [
+    { name: '봄 플로럴 룩', photoId: '1518717758536-85ae29035b6d', outfitId: 'floral-spring' },
+    { name: '파티 드레스', photoId: '1519689680058-324335c6d2a5', outfitId: 'party-dressy' },
+    { name: '데님 스포티', photoId: '1515488042361-ee00e0ddd4e4', outfitId: 'denim-sporty' },
+    { name: '코지 레이어드', photoId: '1516627145497-ae6968895b74', outfitId: 'cozy-layered' },
+    { name: '핑크 걸리시', photoId: '1503454537195-1dcabb73ffb9', outfitId: 'pink-girly' },
+  ];
+  scroll.innerHTML = infData.map(inf => `
+    <div class="influencer-card" onclick="applyInfluencerOutfit('${inf.outfitId}')">
+      <img src="https://images.unsplash.com/photo-${inf.photoId}?w=220&h=260&fit=crop&q=80"
+           alt="${inf.name}"
+           loading="lazy"
+           onerror="this.style.display='none'">
+      <div class="inf-label">${inf.name}</div>
     </div>
   `).join('');
 }
 
-function filterFeed(el, occ) {
-  document.querySelectorAll('.occ-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  currentOcc = occ;
-  renderFeed(occ);
+function applyInfluencerOutfit(outfitId) {
+  const set = OUTFIT_SETS.find(s => s.id === outfitId);
+  if (!set) return;
+  selectedItemIds.clear();
+  set.itemIds.forEach(id => selectedItemIds.add(id));
+  renderSimChips();
+  updateSelectionBar();
+  transitionToOutfit(set, false);
+  showToast(`"${set.name}" 코디를 적용했어요! ✨`);
 }
 
-function toggleLike(e, id) {
-  e.stopPropagation();
-  const item = feedItems.find(f => f.id === id);
-  if (!item) return;
-  item.liked = !item.liked;
-  const btn = document.getElementById('heart-' + id);
-  if (btn) {
-    btn.textContent = item.liked ? '❤️' : '🤍';
-    btn.className = 'feed-heart ' + (item.liked ? 'liked' : '');
-    btn.style.transform = 'scale(1.4)';
-    setTimeout(() => { btn.style.transform = ''; }, 300);
+/* =====================================================
+   STYLE FEED
+   ===================================================== */
+function renderFeed(filterCat) {
+  const grid = document.getElementById('feedGrid');
+  const items = filterCat === '전체' ? FEED_ITEMS : FEED_ITEMS.filter(f => f.tag_cat === filterCat);
+
+  if (items.length === 0) {
+    grid.innerHTML = '<div class="empty-state" style="column-span:all"><div class="emoji">🌸</div><div class="msg">해당 스타일이 없어요</div></div>';
+    return;
   }
-  if (item.liked) showToast('스타일 저장 완료! 💕');
+
+  grid.innerHTML = items.map(item => {
+    const isLiked = likedFeedItems.has(item.id);
+    return `
+      <div class="feed-item" id="feed-${item.id}">
+        <button class="heart-btn ${isLiked ? 'liked' : ''}" onclick="toggleHeart(event, '${item.id}')">
+          ${isLiked ? '♥' : '♡'}
+        </button>
+        <img
+          src="https://images.unsplash.com/photo-${item.photoId}?w=300&h=${item.height}&fit=crop&q=80"
+          alt="${item.title}"
+          loading="lazy"
+          onerror="this.style.display='none'"
+        >
+        <div class="feed-item-info">
+          <span class="feed-item-tag">${item.tag}</span>
+          <div class="feed-item-title">${item.title}</div>
+          <button class="feed-item-apply" onclick="applyFeedOutfit('${item.outfitSetId}')">
+            내 아이에게 적용 →
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
-// ===================================================
-// HELPERS
-// ===================================================
+function filterFeed(btn, cat) {
+  document.querySelectorAll('#feedFilters .filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderFeed(cat);
+}
+
+function toggleHeart(event, itemId) {
+  event.stopPropagation();
+  const btn = event.currentTarget;
+  if (likedFeedItems.has(itemId)) {
+    likedFeedItems.delete(itemId);
+    btn.classList.remove('liked');
+    btn.textContent = '♡';
+    showToast('저장 취소했어요');
+  } else {
+    likedFeedItems.add(itemId);
+    btn.classList.add('liked');
+    btn.textContent = '♥';
+    // heart bounce
+    btn.style.transform = 'scale(1.4)';
+    setTimeout(() => { btn.style.transform = ''; }, 200);
+    showToast('스타일 피드에 저장했어요 💕');
+  }
+}
+
+function applyFeedOutfit(outfitSetId) {
+  const set = OUTFIT_SETS.find(s => s.id === outfitSetId);
+  if (!set) return;
+  selectedItemIds.clear();
+  set.itemIds.forEach(id => selectedItemIds.add(id));
+  switchTab('sim');
+  renderSimChips();
+  updateSelectionBar();
+  transitionToOutfit(set, false);
+  showToast(`"${set.name}" 코디를 적용했어요! 👗`);
+}
+
+/* =====================================================
+   TOAST
+   ===================================================== */
+let toastTimer = null;
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
 }
 
-function randomPastel() {
-  const colors = ['#FFE4E8','#FFE4FF','#E4E8FF','#EDE4FF','#FFF0E4','#E4F4FF','#E4FFE8','#FFFCE4'];
-  return colors[Math.floor(Math.random() * colors.length)];
-}
-
-// Clock
-function updateClock() {
+/* =====================================================
+   DATE/TIME
+   ===================================================== */
+function updateDateTime() {
   const now = new Date();
-  const h = now.getHours().toString().padStart(2,'0');
-  const m = now.getMinutes().toString().padStart(2,'0');
-  const timeEl = document.querySelector('.status-bar .time');
-  if (timeEl) timeEl.textContent = h + ':' + m;
+  const days = ['일','월','화','수','목','금','토'];
+  const el = document.getElementById('homeDateEl');
+  if (el) {
+    el.textContent = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일 (${days[now.getDay()]})`;
+  }
 }
-updateClock();
-setInterval(updateClock, 30000);
+
+/* =====================================================
+   INIT
+   ===================================================== */
+function init() {
+  updateDateTime();
+
+  // Render wardrobe
+  renderWardrobe('전체');
+
+  // Initialize simulation with a random outfit
+  const randomOutfit = OUTFIT_SETS[Math.floor(Math.random() * OUTFIT_SETS.length)];
+  currentOutfitSet = randomOutfit;
+
+  // Pre-select items for initial outfit
+  randomOutfit.itemIds.forEach(id => selectedItemIds.add(id));
+
+  // Set initial photo (no transition, no shimmer)
+  const imgA = document.getElementById('imgA');
+  imgA.src = unsplashUrl(randomOutfit.photoId, 380, 520);
+  document.getElementById('simOutfitName').textContent = randomOutfit.name;
+  document.getElementById('simOutfitSub').textContent = randomOutfit.sub;
+
+  renderSimChips();
+  renderInfluencerCards();
+  renderFeed('전체');
+
+  // Set initial nav state
+  const homeNav = document.getElementById('nav-home');
+  if (homeNav) {
+    homeNav.querySelectorAll('svg').forEach(svg => {
+      svg.querySelectorAll('[stroke]').forEach(el => { if (el.getAttribute('stroke') !== 'none') el.setAttribute('stroke', '#FF8FAB'); });
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
