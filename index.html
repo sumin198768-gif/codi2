@@ -580,16 +580,24 @@ async function runTryOnHuggingFace(personUrl, garmentUrl, item){
         const ev = JSON.parse(e.data);
         if(ev.msg === 'process_completed'){
           clearTimeout(timeout); es.close();
+          if(!ev.success) return reject(new Error('HF 처리 오류: '+(ev.output?.error||'unknown')));
           const out = ev.output?.data;
-          const url = Array.isArray(out) && out[0] ? (out[0].url || `${HF_SPACE}/file=${out[0].path}`) : null;
-          if(!url) return reject(new Error('결과 이미지 없음'));
+          let url = null;
+          if(Array.isArray(out)){
+            for(const item of out){
+              if(!item) continue;
+              if(item.url) { url = item.url; break; }
+              if(item.path) { url = `${HF_SPACE}/file=${item.path}`; break; }
+            }
+          }
+          if(!url) return reject(new Error('결과 이미지 없음 (output: '+JSON.stringify(out)?.substring(0,100)+')'));
           showResult(url);
           resolve();
         } else if(ev.msg === 'queue_full'){
           clearTimeout(timeout); es.close();
           reject(new Error('HF 대기열 가득 참, 잠시 후 다시 시도하세요'));
         }
-      } catch(e){}
+      } catch(e){ console.error('HF SSE parse error', e); }
     };
     es.onerror = () => { clearTimeout(timeout); es.close(); reject(new Error('HF Space 연결 오류')); };
   });
