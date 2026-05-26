@@ -4,1984 +4,789 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>코디맘 - 아이 옷 코디 도우미</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pink:#FF8FAB;--pink2:#FFB3C6;--pink3:#FFD6E7;
+  --purple:#C9B8FF;--purple2:#E8E2FF;
+  --bg:#FFF5F8;--card:#fff;
+  --text:#2D2030;--muted:#9B8FA0;--light:#C5BAC9;
+  --border:#F0E6EC;
+  --r:16px;--r2:12px;--r3:8px;
+  --shadow:0 4px 20px rgba(255,143,171,.12);
+  --shadow2:0 8px 32px rgba(255,143,171,.2);
+  --nav:64px;
+}
+html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:#ecdce8;color:var(--text);-webkit-font-smoothing:antialiased}
+body{display:flex;justify-content:center;min-height:100vh}
+#app{width:100%;max-width:390px;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.18)}
 
-:root {
-  --primary: #FF8FAB;
-  --primary-light: #FFB3C6;
-  --primary-dark: #E8607A;
-  --secondary: #C9B8FF;
-  --secondary-light: #DDD5FF;
-  --accent: #FFD6E7;
-  --accent2: #B5EAD7;
-  --accent3: #FFDAC1;
-  --bg: #FFF5F8;
-  --card: #FFFFFF;
-  --text: #2D2D2D;
-  --text-muted: #888;
-  --text-light: #BBB;
-  --border: #F0E6EC;
-  --shadow: 0 4px 20px rgba(255,143,171,0.12);
-  --shadow-md: 0 8px 32px rgba(255,143,171,0.18);
-  --shadow-lg: 0 16px 48px rgba(255,143,171,0.22);
-  --radius: 18px;
-  --radius-sm: 12px;
-  --nav-h: 72px;
-  --header-h: 60px;
-}
+/* ── HEADER ── */
+.hdr{position:sticky;top:0;z-index:99;background:rgba(255,245,248,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.hdr-logo{font-size:20px;font-weight:700;color:var(--pink);letter-spacing:-.5px}
+.hdr-logo span{color:var(--purple)}
+.hdr-icons{display:flex;gap:10px}
+.hdr-icon{width:34px;height:34px;border-radius:50%;background:var(--pink3);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px}
 
-html, body {
-  height: 100%;
-  font-family: 'Noto Sans KR', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-}
+/* ── TABS ── */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--nav)+8px);-webkit-overflow-scrolling:touch}
+.panel{display:none;animation:up .22s ease}
+.panel.on{display:block}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-body {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
-}
+/* ── BOTTOM NAV ── */
+.nav{position:sticky;bottom:0;z-index:99;background:#fff;border-top:1px solid var(--border);height:var(--nav);display:flex;box-shadow:0 -4px 20px rgba(0,0,0,.06)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--light);transition:color .2s}
+.nav-btn.on{color:var(--pink)}
+.nav-btn svg{width:22px;height:22px}
+.nav-btn span{font-size:10px;font-weight:500}
 
-#app {
-  width: 100%;
-  max-width: 390px;
-  min-height: 100vh;
-  background: var(--bg);
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
+/* ── HOME ── */
+.home-banner{margin:16px;border-radius:var(--r);background:linear-gradient(135deg,var(--pink) 0%,#ff6b9d 100%);padding:20px;color:#fff;position:relative;overflow:hidden}
+.home-banner::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1)}
+.home-banner h2{font-size:18px;font-weight:700;margin-bottom:4px}
+.home-banner p{font-size:13px;opacity:.85}
+.home-banner .weather-big{font-size:36px;font-weight:300;margin-top:8px}
+.home-banner .city{font-size:12px;opacity:.75;margin-top:2px}
 
-/* ========== SCROLLABLE CONTENT ========== */
-.tab-content {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-bottom: calc(var(--nav-h) + 16px);
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
+.profile-card{margin:0 16px 16px;background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
+.profile-avatar{width:68px;height:68px;border-radius:50%;object-fit:cover;border:3px solid var(--pink3);flex-shrink:0}
+.profile-avatar-err{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--pink3),var(--purple2));display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.profile-info h3{font-size:15px;font-weight:700;margin-bottom:2px}
+.profile-info p{font-size:12px;color:var(--muted)}
+.profile-badge{display:inline-block;margin-top:5px;padding:3px 9px;background:var(--pink3);border-radius:20px;font-size:11px;color:var(--pink);font-weight:600}
 
-.tab-panel {
-  display: none;
-  padding: 0;
-  animation: fadeIn 0.25s ease;
-}
-.tab-panel.active {
-  display: block;
-}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 16px 16px}
+.stat-box{background:var(--card);border-radius:var(--r2);padding:12px;text-align:center;box-shadow:var(--shadow)}
+.stat-box .num{font-size:22px;font-weight:700;color:var(--pink)}
+.stat-box .lbl{font-size:11px;color:var(--muted);margin-top:2px}
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+.weather-row{display:flex;gap:10px;margin:0 16px 16px}
+.weather-card{flex:1;background:var(--card);border-radius:var(--r2);padding:12px;box-shadow:var(--shadow);text-align:center}
+.weather-card .day{font-size:11px;color:var(--muted);margin-bottom:4px}
+.weather-card .temp{font-size:20px;font-weight:700;color:var(--text)}
+.weather-card .desc{font-size:11px;color:var(--muted);margin-top:2px}
+.weather-card .icon{font-size:24px;margin-bottom:4px}
 
-/* ========== TOP HEADER ========== */
-.top-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(255,245,248,0.96);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  height: var(--header-h);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  border-bottom: 1px solid var(--border);
-}
-.top-header .logo {
-  font-size: 22px;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
-}
-.top-header .header-right {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.header-icon-btn {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: none;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: transform 0.15s, background 0.15s;
-}
-.header-icon-btn:active { transform: scale(0.92); }
+.cta-btn{display:block;margin:0 16px 24px;padding:16px;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;border-radius:var(--r);color:#fff;font-size:15px;font-weight:700;text-align:center;cursor:pointer;letter-spacing:.3px;box-shadow:0 6px 20px rgba(255,143,171,.4);transition:transform .15s,box-shadow .15s}
+.cta-btn:active{transform:scale(.97);box-shadow:0 2px 10px rgba(255,143,171,.3)}
 
-/* ========== BOTTOM NAV ========== */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 390px;
-  height: var(--nav-h);
-  background: rgba(255,255,255,0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: flex-start;
-  padding-top: 8px;
-  z-index: 200;
-  box-shadow: 0 -4px 20px rgba(255,143,171,0.10);
-}
-.nav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  padding: 4px 0;
-  border: none;
-  background: none;
-  transition: transform 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.nav-item:active { transform: scale(0.92); }
-.nav-icon {
-  width: 26px; height: 26px;
-  display: flex; align-items: center; justify-content: center;
-  position: relative;
-}
-.nav-icon svg { transition: fill 0.2s, stroke 0.2s; }
-.nav-label {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--text-muted);
-  transition: color 0.2s;
-}
-.nav-item.active .nav-label { color: var(--primary); font-weight: 700; }
-.nav-item.active .nav-icon-bg {
-  background: var(--accent);
-  border-radius: 12px;
-  padding: 4px 10px;
-}
-.nav-dot {
-  position: absolute;
-  top: -2px; right: -2px;
-  width: 8px; height: 8px;
-  background: var(--primary);
-  border-radius: 50%;
-  border: 2px solid white;
-}
+/* ── WARDROBE ── */
+.sec-header{padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between}
+.sec-title{font-size:16px;font-weight:700}
+.sec-sub{font-size:12px;color:var(--muted)}
 
-/* ========== SECTION HEADERS ========== */
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 20px 12px;
-}
-.section-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text);
-}
-.section-link {
-  font-size: 13px;
-  color: var(--primary);
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  background: none;
-}
+.filter-row{display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-pill{padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.filter-pill.on{background:var(--pink);border-color:var(--pink);color:#fff}
 
-/* ========== CARDS ========== */
-.card {
-  background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
+.clothes-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 12px}
+.cloth-card{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;position:relative;transition:transform .15s,box-shadow .15s}
+.cloth-card:active{transform:scale(.97)}
+.cloth-card.selected{outline:3px solid var(--pink);outline-offset:0px}
+.cloth-card.selected::after{content:'✓';position:absolute;top:8px;right:8px;width:24px;height:24px;background:var(--pink);border-radius:50%;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:2}
+.cloth-card.dirty{opacity:.6}
+.cloth-img-wrap{width:100%;aspect-ratio:1;overflow:hidden;background:#f7f2f5;position:relative}
+.cloth-img{width:100%;height:100%;object-fit:cover;display:block}
+.cloth-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;background:linear-gradient(135deg,var(--pink3),var(--purple2))}
+.cloth-info{padding:10px 10px 8px}
+.cloth-name{font-size:13px;font-weight:600;margin-bottom:4px}
+.cloth-meta{display:flex;align-items:center;justify-content:space-between}
+.cloth-cat{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--pink3);color:var(--pink);font-weight:600}
+.cloth-laundry{font-size:16px;cursor:pointer;background:none;border:none;padding:0;line-height:1}
 
-/* ========== HOME TAB ========== */
-.home-top {
-  padding: 24px 20px 0;
-}
-.home-greeting {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--text);
-  line-height: 1.3;
-}
-.home-greeting span { color: var(--primary); }
-.home-date {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 4px;
-  font-weight: 400;
-}
+.select-bar{position:fixed;bottom:calc(var(--nav));left:50%;transform:translateX(-50%);width:calc(min(390px,100%));background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;z-index:50;box-shadow:0 -4px 20px rgba(255,143,171,.3);animation:slideup .2s ease}
+@keyframes slideup{from{transform:translateX(-50%) translateY(100%)}to{transform:translateX(-50%) translateY(0)}}
+.select-bar.hidden{display:none}
+.select-bar-txt{font-size:14px;font-weight:600}
+.select-bar-btn{background:#fff;color:var(--pink);border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer}
 
-.profile-card {
-  margin: 16px 20px 0;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: linear-gradient(135deg, #FFF0F5, #F5F0FF);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-}
-.profile-avatar {
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid var(--primary);
-  flex-shrink: 0;
-  box-shadow: 0 4px 14px rgba(255,143,171,0.3);
-}
-.profile-avatar-placeholder {
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-light), var(--secondary));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px;
-  flex-shrink: 0;
-  border: 3px solid var(--primary);
-}
-.profile-info .name {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
-}
-.profile-info .meta {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 3px;
-  font-weight: 400;
-}
-.profile-stats {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-.profile-stat {
-  background: white;
-  border-radius: 10px;
-  padding: 5px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--primary-dark);
-  border: 1px solid var(--accent);
-}
+.fab{position:fixed;bottom:calc(var(--nav) + 16px);right:calc(50% - 195px + 16px);width:48px;height:48px;border-radius:50%;background:var(--pink);color:#fff;border:none;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(255,143,171,.4);display:flex;align-items:center;justify-content:center;z-index:40;transition:transform .15s}
+.fab:active{transform:scale(.9)}
+.fab.hidden{display:none}
 
-.weather-card {
-  margin: 14px 20px 0;
-  padding: 18px 20px;
-  background: linear-gradient(135deg, #E8F4FD, #D4E8F8);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  border: 1px solid #C8DFF0;
-}
-.weather-icon-wrap {
-  width: 52px; height: 52px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.7);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.weather-main {
-  flex: 1;
-}
-.weather-city {
-  font-size: 13px;
-  color: #5B8DB0;
-  font-weight: 500;
-}
-.weather-temp {
-  font-size: 28px;
-  font-weight: 800;
-  color: #2A6090;
-  line-height: 1.1;
-}
-.weather-desc {
-  font-size: 12px;
-  color: #6CA0BC;
-  margin-top: 2px;
-}
-.weather-tomorrow {
-  text-align: right;
-}
-.weather-tomorrow .label {
-  font-size: 11px;
-  color: #7BAAC8;
-}
-.weather-tomorrow .temp {
-  font-size: 18px;
-  font-weight: 700;
-  color: #3A7AAA;
-}
+/* ── SIMULATION ── */
+.sim-container{padding:0 16px 16px}
 
-.cta-button {
-  margin: 16px 20px 0;
-  width: calc(100% - 40px);
-  padding: 18px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  border: none;
-  border-radius: var(--radius);
-  font-size: 16px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  box-shadow: 0 6px 24px rgba(255,143,171,0.4);
-  transition: transform 0.15s, box-shadow 0.15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  letter-spacing: -0.3px;
-}
-.cta-button:active {
-  transform: scale(0.97);
-  box-shadow: 0 3px 12px rgba(255,143,171,0.3);
-}
+.sim-canvas-wrap{position:relative;width:100%;border-radius:var(--r);overflow:hidden;background:#f0e8f0;box-shadow:var(--shadow2)}
+.sim-child-img{width:100%;display:block;object-fit:cover;transition:opacity .3s}
+.sim-child-placeholder{width:100%;aspect-ratio:2/3;display:flex;align-items:center;justify-content:center}
 
-.stats-row {
-  margin: 14px 20px 0;
-  display: flex;
-  gap: 10px;
-}
-.stat-card {
-  flex: 1;
-  background: var(--card);
-  border-radius: var(--radius-sm);
-  padding: 14px 10px;
-  text-align: center;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-}
-.stat-num {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--primary);
-}
-.stat-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 3px;
-  font-weight: 400;
-}
+/* Clothing overlays on child photo */
+.overlay-zone{position:absolute;pointer-events:none;transition:opacity .35s}
+.overlay-zone img{width:100%;height:100%;object-fit:cover;border-radius:8px;opacity:.88;mix-blend-mode:multiply}
+.overlay-zone.hidden{opacity:0}
+.overlay-zone.visible{opacity:1}
 
-/* ========== WARDROBE TAB ========== */
-.category-filters {
-  padding: 16px 20px 4px;
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.category-filters::-webkit-scrollbar { display: none; }
+/* zone positions (% of container) */
+.zone-accessory{top:2%;left:28%;width:44%;height:17%}
+.zone-outer   {top:19%;left:5%; width:90%;height:42%}
+.zone-top     {top:22%;left:14%;width:72%;height:34%}
+.zone-dress   {top:19%;left:8%; width:84%;height:60%}
+.zone-bottom  {top:53%;left:18%;width:64%;height:30%}
+.zone-shoes   {top:81%;left:15%;width:70%;height:18%}
 
-.filter-pill {
-  flex-shrink: 0;
-  padding: 7px 16px;
-  border-radius: 50px;
-  border: 1.5px solid var(--border);
-  background: var(--card);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: inherit;
-  -webkit-tap-highlight-color: transparent;
-}
-.filter-pill.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-  font-weight: 700;
-  box-shadow: 0 3px 10px rgba(255,143,171,0.35);
-}
-.filter-pill:active { transform: scale(0.95); }
+.sim-shimmer{position:absolute;inset:0;background:linear-gradient(90deg,transparent 25%,rgba(255,255,255,.6) 50%,transparent 75%);background-size:200% 100%;animation:shimmer .9s infinite;opacity:0;transition:opacity .2s;border-radius:var(--r);z-index:3}
+.sim-shimmer.on{opacity:1}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
 
-.wardrobe-grid {
-  padding: 12px 16px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
+.sim-outfit-label{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-radius:var(--r2);padding:10px 14px;display:flex;align-items:center;gap:8px}
+.ai-badge{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;white-space:nowrap}
+.outfit-name{font-size:13px;font-weight:600;color:var(--text)}
 
-.clothing-card {
-  background: var(--card);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  border: 2.5px solid transparent;
-  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
-  position: relative;
-  -webkit-tap-highlight-color: transparent;
-}
-.clothing-card.selected {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(255,143,171,0.25), var(--shadow-md);
-  transform: scale(1.02);
-}
-.clothing-card:active { transform: scale(0.97); }
-.clothing-card.selected:active { transform: scale(0.99); }
+.sim-chips{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0 4px}
+.sim-chip{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;transition:all .15s}
+.sim-chip img{width:24px;height:24px;object-fit:cover;border-radius:6px}
+.sim-chip .x{color:var(--muted);font-size:14px;margin-left:2px}
+.sim-chip:hover{border-color:var(--pink);color:var(--pink)}
+.sim-empty{padding:16px 0;text-align:center;color:var(--muted);font-size:13px}
 
-.clothing-img-wrap {
-  width: 100%;
-  aspect-ratio: 1;
-  background: #F8F0F4;
-  position: relative;
-  overflow: hidden;
-}
-.clothing-img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
-  display: block;
-}
-.clothing-card:active .clothing-img { transform: scale(1.04); }
+.sim-actions{display:flex;gap:10px;padding:8px 0 16px}
+.sim-btn{flex:1;padding:12px;border-radius:var(--r2);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none}
+.sim-btn.primary{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 4px 14px rgba(255,143,171,.35)}
+.sim-btn.secondary{background:var(--card);color:var(--pink);border:1.5px solid var(--pink3)}
+.sim-btn:active{transform:scale(.97)}
 
-.clothing-img-placeholder {
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 36px;
-  background: linear-gradient(135deg, #FFF0F5, #F0EBFF);
-}
+/* influencer cards */
+.inf-section{margin-top:8px}
+.inf-title{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.inf-scroll{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.inf-scroll::-webkit-scrollbar{display:none}
+.inf-card{flex-shrink:0;width:140px;border-radius:var(--r2);overflow:hidden;background:var(--card);box-shadow:var(--shadow);cursor:pointer}
+.inf-card img{width:100%;height:180px;object-fit:cover;display:block}
+.inf-card-info{padding:8px 10px}
+.inf-card-name{font-size:12px;font-weight:600}
+.inf-card-tag{font-size:10px;color:var(--muted)}
 
-.check-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(255,143,171,0.18);
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 8px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.clothing-card.selected .check-overlay { opacity: 1; }
-.check-circle {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: var(--primary);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 2px 8px rgba(255,143,171,0.5);
-}
+/* ── STYLE FEED ── */
+.feed-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 16px}
+.feed-card{border-radius:var(--r);overflow:hidden;background:var(--card);box-shadow:var(--shadow);cursor:pointer;position:relative}
+.feed-card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.feed-card-info{padding:10px}
+.feed-card-title{font-size:12px;font-weight:600;margin-bottom:4px}
+.feed-card-tags{display:flex;flex-wrap:wrap;gap:4px}
+.feed-tag{font-size:10px;padding:2px 7px;background:var(--pink3);border-radius:10px;color:var(--pink)}
+.feed-heart{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.85);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.feed-heart.liked{animation:heartpop .3s ease}
+@keyframes heartpop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
+.feed-apply{display:block;width:calc(100% - 20px);margin:6px 10px 10px;padding:8px;background:var(--pink);border:none;border-radius:var(--r3);color:#fff;font-size:12px;font-weight:600;cursor:pointer}
 
-.laundry-badge {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  padding: 3px 8px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-.laundry-badge.clean {
-  background: rgba(181,234,215,0.95);
-  color: #2D8A5A;
-}
-.laundry-badge.dirty {
-  background: rgba(255,218,193,0.95);
-  color: #B05A2A;
-}
-
-.clothing-info {
-  padding: 10px 12px 12px;
-}
-.clothing-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.clothing-cat-badge {
-  display: inline-block;
-  margin-top: 5px;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 600;
-  background: var(--accent);
-  color: var(--primary-dark);
-}
-
-.laundry-toggle {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  background: rgba(255,255,255,0.92);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: transform 0.15s;
-  z-index: 5;
-  -webkit-tap-highlight-color: transparent;
-}
-.laundry-toggle:active { transform: scale(0.88); }
-
-.selection-bottom-bar {
-  position: fixed;
-  bottom: var(--nav-h);
-  left: 50%;
-  transform: translateX(-50%) translateY(100px);
-  width: 100%;
-  max-width: 390px;
-  padding: 12px 20px;
-  background: rgba(255,255,255,0.97);
-  backdrop-filter: blur(16px);
-  border-top: 1px solid var(--border);
-  z-index: 150;
-  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-}
-.selection-bottom-bar.visible {
-  transform: translateX(-50%) translateY(0);
-}
-.selection-go-btn {
-  width: 100%;
-  padding: 15px;
-  background: linear-gradient(135deg, var(--primary), #FF6B95);
-  color: white;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 15px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 4px 16px rgba(255,143,171,0.4);
-  transition: transform 0.12s, box-shadow 0.12s;
-  letter-spacing: -0.2px;
-}
-.selection-go-btn:active {
-  transform: scale(0.97);
-  box-shadow: 0 2px 8px rgba(255,143,171,0.3);
-}
-
-.fab {
-  position: fixed;
-  bottom: calc(var(--nav-h) + 16px);
-  right: calc(50% - 190px + 16px);
-  width: 52px; height: 52px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(255,143,171,0.45);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 140;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.fab:active {
-  transform: scale(0.9);
-  box-shadow: 0 3px 10px rgba(255,143,171,0.3);
-}
-#wardrobeFab.pushed {
-  bottom: calc(var(--nav-h) + 80px);
-}
-
-/* ========== SIMULATION TAB ========== */
-.sim-weather-banner {
-  margin: 16px 20px 0;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, #E8F4FD, #D4E8F8);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: #3A7AAA;
-  font-weight: 500;
-  border: 1px solid #C8DFF0;
-}
-
-.sim-photo-container {
-  margin: 14px 20px 0;
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  position: relative;
-  background: #F8F0F4;
-  aspect-ratio: 380 / 520;
-  width: calc(100% - 40px);
-}
-
-/* SHIMMER */
-.shimmer-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  background: linear-gradient(
-    105deg,
-    #F8F0F4 0%,
-    #F8F0F4 30%,
-    #FFE4EE 50%,
-    #F8F0F4 70%,
-    #F8F0F4 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmerMove 0.9s ease-in-out infinite;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s;
-}
-.shimmer-overlay.active {
-  opacity: 1;
-}
-@keyframes shimmerMove {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* The two crossfading images */
-.sim-photo-slot {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-}
-.sim-photo-slot img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.sim-photo-slot .photo-placeholder {
-  width: 100%; height: 100%;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 10px;
-  font-size: 60px;
-  background: linear-gradient(135deg, #FFF0F5, #F0EBFF);
-}
-.sim-photo-slot .photo-placeholder span {
-  font-size: 15px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-/* slot A and slot B for crossfade */
-#slotA, #slotB {
-  transition: opacity 0.4s ease;
-}
-#slotA { opacity: 1; z-index: 2; }
-#slotB { opacity: 0; z-index: 1; }
-#slotA.hidden { opacity: 0; z-index: 1; }
-#slotB.visible { opacity: 1; z-index: 2; }
-
-.sim-ai-badge {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  z-index: 8;
-  padding: 6px 14px;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(8px);
-  border-radius: 30px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--primary-dark);
-  box-shadow: 0 2px 10px rgba(255,143,171,0.2);
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.sim-outfit-name-overlay {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  z-index: 8;
-  background: linear-gradient(transparent, rgba(0,0,0,0.55));
-  padding: 40px 16px 16px;
-}
-.sim-outfit-name {
-  font-size: 16px;
-  font-weight: 700;
-  color: white;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
-}
-.sim-outfit-sub {
-  font-size: 12px;
-  color: rgba(255,255,255,0.8);
-  margin-top: 3px;
-}
-
-/* Selected chips */
-.sim-chips-label {
-  padding: 14px 20px 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-.sim-chips {
-  padding: 0 20px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  min-height: 36px;
-}
-.outfit-chip {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  background: var(--card);
-  border: 1.5px solid var(--primary-light);
-  border-radius: 30px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--primary-dark);
-  cursor: pointer;
-  transition: all 0.15s;
-  box-shadow: 0 2px 6px rgba(255,143,171,0.12);
-  -webkit-tap-highlight-color: transparent;
-}
-.outfit-chip:hover { background: var(--accent); }
-.outfit-chip:active { transform: scale(0.93); }
-.outfit-chip .remove-x {
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: var(--primary-light);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px;
-  color: white;
-  font-weight: 900;
-}
-
-.sim-actions {
-  padding: 14px 20px 0;
-  display: flex;
-  gap: 10px;
-}
-.sim-btn {
-  flex: 1;
-  padding: 13px 10px;
-  border-radius: var(--radius-sm);
-  border: none;
-  font-size: 13px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s;
-  -webkit-tap-highlight-color: transparent;
-}
-.sim-btn:active { transform: scale(0.96); }
-.sim-btn-primary {
-  background: linear-gradient(135deg, var(--primary), #FF6B95);
-  color: white;
-  box-shadow: 0 4px 14px rgba(255,143,171,0.35);
-}
-.sim-btn-outline {
-  background: var(--card);
-  color: var(--primary);
-  border: 1.5px solid var(--primary-light);
-  box-shadow: var(--shadow);
-}
-
-.sim-influencer-section {
-  padding: 20px 20px 0;
-}
-.sim-influencer-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.sim-influencer-title::before,
-.sim-influencer-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-.influencer-scroll {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding-bottom: 4px;
-}
-.influencer-scroll::-webkit-scrollbar { display: none; }
-.influencer-card {
-  flex-shrink: 0;
-  width: 110px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background: var(--card);
-  box-shadow: var(--shadow);
-  cursor: pointer;
-}
-.influencer-card img {
-  width: 110px; height: 130px;
-  object-fit: cover;
-  display: block;
-}
-.influencer-card .inf-label {
-  padding: 6px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ========== FEED TAB ========== */
-.feed-filters {
-  padding: 16px 20px 4px;
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.feed-filters::-webkit-scrollbar { display: none; }
-
-.feed-grid {
-  padding: 12px 16px;
-  columns: 2;
-  column-gap: 12px;
-}
-.feed-item {
-  break-inside: avoid;
-  margin-bottom: 12px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background: var(--card);
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  position: relative;
-  -webkit-tap-highlight-color: transparent;
-}
-.feed-item img {
-  width: 100%;
-  display: block;
-  object-fit: cover;
-}
-.feed-item-info {
-  padding: 10px 10px 12px;
-}
-.feed-item-tag {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 700;
-  background: var(--accent);
-  color: var(--primary-dark);
-  margin-bottom: 5px;
-}
-.feed-item-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.4;
-}
-.feed-item-apply {
-  width: 100%;
-  margin-top: 8px;
-  padding: 7px;
-  background: var(--accent);
-  color: var(--primary-dark);
-  border: none;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.12s;
-}
-.feed-item-apply:active {
-  background: var(--primary-light);
-  transform: scale(0.96);
-}
-
-.heart-btn {
-  position: absolute;
-  top: 8px; right: 8px;
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.9);
-  border: none;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
-  -webkit-tap-highlight-color: transparent;
-  z-index: 5;
-}
-.heart-btn:active { transform: scale(0.82); }
-.heart-btn.liked { color: var(--primary); }
-.heart-btn:not(.liked) { color: #CCC; }
-
-/* ========== TOAST ========== */
-.toast {
-  position: fixed;
-  bottom: calc(var(--nav-h) + 16px);
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: rgba(45,45,45,0.94);
-  color: white;
-  padding: 11px 20px;
-  border-radius: 30px;
-  font-size: 13px;
-  font-weight: 600;
-  z-index: 9999;
-  opacity: 0;
-  transition: opacity 0.25s, transform 0.25s;
-  pointer-events: none;
-  white-space: nowrap;
-}
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* ========== EMPTY STATE ========== */
-.empty-state {
-  padding: 40px 20px;
-  text-align: center;
-  color: var(--text-muted);
-}
-.empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
-.empty-state .msg { font-size: 15px; font-weight: 500; }
-.empty-state .sub { font-size: 13px; margin-top: 6px; font-weight: 400; }
-
-/* ========== SPACING ========== */
-.pb16 { padding-bottom: 16px; }
-.mb20 { margin-bottom: 20px; }
+/* ── EMPTY / MISC ── */
+.section-gap{height:16px}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- TAB CONTENT -->
-  <div class="tab-content">
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-logo">코디<span>맘</span> 👗</div>
+    <div class="hdr-icons">
+      <button class="hdr-icon" onclick="alert('알림이 없습니다.')">🔔</button>
+      <button class="hdr-icon" onclick="alert('설정')">⚙️</button>
+    </div>
+  </div>
 
-    <!-- ===== HOME TAB ===== -->
-    <div class="tab-panel active" id="panel-home">
-      <div class="top-header">
-        <div class="logo">코디맘 👧</div>
-        <div class="header-right">
-          <button class="header-icon-btn" onclick="showToast('알림이 없어요 😊')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8FAB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-          </button>
+  <!-- CONTENT -->
+  <div class="content" id="content">
+
+    <!-- ── TAB 1: HOME ── -->
+    <div class="panel on" id="tab-home">
+      <div class="home-banner">
+        <div class="city">📍 서울특별시</div>
+        <div class="weather-big">22°C ⛅</div>
+        <h2 id="greeting">안녕하세요! 오늘도 예쁘게 입혀봐요 💕</h2>
+        <p id="today-date">2026년 5월 26일 월요일</p>
+      </div>
+
+      <div class="profile-card">
+        <img class="profile-avatar"
+          src="https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?w=140&h=140&fit=crop&q=80"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+          alt="지아">
+        <div class="profile-avatar-err" style="display:none">👧</div>
+        <div class="profile-info">
+          <h3>김지아</h3>
+          <p>여아 · 만 3세 · 95cm · 14kg</p>
+          <div class="profile-badge">Size 100</div>
         </div>
       </div>
 
-      <div class="home-top">
-        <div class="home-greeting">안녕하세요! 👋<br><span>지아</span>의 오늘 코디를 골라볼까요?</div>
-        <div class="home-date" id="homeDateEl">날짜 로딩중...</div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="num" id="stat-total">12</div><div class="lbl">전체 옷</div></div>
+        <div class="stat-box"><div class="num" id="stat-clean">9</div><div class="lbl">깨끗한 옷</div></div>
+        <div class="stat-box"><div class="num" id="stat-sim">5</div><div class="lbl">코디 추천</div></div>
       </div>
 
-      <!-- Profile Card -->
-      <div class="profile-card">
-        <img
-          class="profile-avatar"
-          src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=200&h=200&fit=crop&q=80"
-          alt="김지아"
-          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-        >
-        <div class="profile-avatar-placeholder" style="display:none;">👧</div>
-        <div class="profile-info">
-          <div class="name">김지아</div>
-          <div class="meta">만 3살 · 95cm · 14kg</div>
-          <div class="profile-stats">
-            <span class="profile-stat">사이즈 100</span>
-            <span class="profile-stat">봄/여름</span>
+      <div class="weather-row">
+        <div class="weather-card">
+          <div class="icon">⛅</div>
+          <div class="day">오늘</div>
+          <div class="temp">22°C</div>
+          <div class="desc">구름 조금</div>
+        </div>
+        <div class="weather-card">
+          <div class="icon">☀️</div>
+          <div class="day">내일</div>
+          <div class="temp">26°C</div>
+          <div class="desc">맑음</div>
+        </div>
+        <div class="weather-card">
+          <div class="icon">🌧️</div>
+          <div class="day">모레</div>
+          <div class="temp">18°C</div>
+          <div class="desc">비</div>
+        </div>
+      </div>
+
+      <button class="cta-btn" onclick="goTab('sim');autoRecommend()">
+        ✨ 오늘의 코디 추천받기
+      </button>
+    </div>
+
+    <!-- ── TAB 2: WARDROBE ── -->
+    <div class="panel" id="tab-wardrobe">
+      <div class="sec-header">
+        <div class="sec-title">👚 우리 아이 옷장</div>
+        <div class="sec-sub" id="wardrobe-count">12벌</div>
+      </div>
+
+      <div class="filter-row" id="filter-row">
+        <button class="filter-pill on" data-cat="전체" onclick="filterClothes(this)">전체</button>
+        <button class="filter-pill" data-cat="상의" onclick="filterClothes(this)">상의</button>
+        <button class="filter-pill" data-cat="하의" onclick="filterClothes(this)">하의</button>
+        <button class="filter-pill" data-cat="원피스" onclick="filterClothes(this)">원피스</button>
+        <button class="filter-pill" data-cat="아우터" onclick="filterClothes(this)">아우터</button>
+        <button class="filter-pill" data-cat="신발" onclick="filterClothes(this)">신발</button>
+        <button class="filter-pill" data-cat="액세서리" onclick="filterClothes(this)">액세서리</button>
+      </div>
+
+      <div class="clothes-grid" id="clothes-grid"></div>
+      <div class="section-gap"></div>
+    </div>
+
+    <!-- ── TAB 3: SIMULATION ── -->
+    <div class="panel" id="tab-sim">
+      <div class="sec-header">
+        <div class="sec-title">👗 코디 시뮬레이션</div>
+        <div class="sec-sub">⛅ 오늘 서울 22°C</div>
+      </div>
+
+      <div class="sim-container">
+
+        <!-- 아이 사진 + 옷 오버레이 -->
+        <div class="sim-canvas-wrap" id="simWrap" style="aspect-ratio:2/3">
+          <!-- 기본 아이 사진 (베이스 레이어) -->
+          <img class="sim-child-img" id="simChildImg"
+            src="https://images.unsplash.com/photo-1609823056967-e56294bf6921?w=380&h=570&fit=crop&q=85"
+            onerror="handleChildImgErr()"
+            style="width:100%;height:100%;position:absolute;top:0;left:0;object-fit:cover"
+            alt="아이">
+
+          <!-- 옷 오버레이 레이어들 -->
+          <div class="overlay-zone zone-accessory hidden" id="ov-accessory">
+            <img id="ov-accessory-img" src="" alt="">
+          </div>
+          <div class="overlay-zone zone-outer hidden" id="ov-outer">
+            <img id="ov-outer-img" src="" alt="">
+          </div>
+          <div class="overlay-zone zone-dress hidden" id="ov-dress">
+            <img id="ov-dress-img" src="" alt="">
+          </div>
+          <div class="overlay-zone zone-top hidden" id="ov-top">
+            <img id="ov-top-img" src="" alt="">
+          </div>
+          <div class="overlay-zone zone-bottom hidden" id="ov-bottom">
+            <img id="ov-bottom-img" src="" alt="">
+          </div>
+          <div class="overlay-zone zone-shoes hidden" id="ov-shoes">
+            <img id="ov-shoes-img" src="" alt="">
+          </div>
+
+          <!-- shimmer -->
+          <div class="sim-shimmer" id="simShimmer"></div>
+
+          <!-- 코디 이름 라벨 -->
+          <div class="sim-outfit-label">
+            <div class="ai-badge">AI 코디</div>
+            <div class="outfit-name" id="simOutfitName">옷을 선택해주세요</div>
           </div>
         </div>
-      </div>
 
-      <!-- Weather Card -->
-      <div class="weather-card">
-        <div class="weather-icon-wrap">
-          <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
-            <circle cx="28" cy="26" r="12" fill="#FFD93D"/>
-            <path d="M28 8V4M28 48v-4M10 26H6M50 26h-4M16.7 14.7l-2.8-2.8M41.3 39.3l-2.8-2.8M16.7 37.3l-2.8 2.8M41.3 14.7l-2.8 2.8" stroke="#FFD93D" stroke-width="2.5" stroke-linecap="round"/>
-            <rect x="16" y="36" width="36" height="10" rx="5" fill="#C8DFF0"/>
-            <rect x="12" y="42" width="34" height="10" rx="5" fill="#A8C8E8"/>
-          </svg>
-        </div>
-        <div class="weather-main">
-          <div class="weather-city">서울특별시</div>
-          <div class="weather-temp">22°C</div>
-          <div class="weather-desc">구름 조금, 나들이 좋은 날씨 ☀️</div>
-        </div>
-        <div class="weather-tomorrow">
-          <div class="label">내일</div>
-          <div class="temp">25°C</div>
-          <div style="font-size:18px;">🌤</div>
-        </div>
-      </div>
-
-      <!-- CTA Button -->
-      <button class="cta-button" onclick="switchTab('sim')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-        </svg>
-        오늘의 코디 추천받기
-      </button>
-
-      <!-- Stats -->
-      <div class="section-header">
-        <div class="section-title">우리 지아 옷장 현황</div>
-      </div>
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-num">12</div>
-          <div class="stat-label">전체 옷</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" style="color:#2D8A5A;">9</div>
-          <div class="stat-label">깨끗한 옷</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" style="color:var(--secondary);">5</div>
-          <div class="stat-label">코디 추천 횟수</div>
-        </div>
-      </div>
-
-      <div class="section-header" style="margin-top:8px;">
-        <div class="section-title">이번 주 날씨 코디 팁</div>
-      </div>
-      <div style="margin: 0 20px 20px; padding: 16px; background: linear-gradient(135deg, #FFF0F5, #F5F0FF); border-radius: var(--radius); border: 1px solid var(--border);">
-        <div style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:8px;">🌸 봄 코디 포인트</div>
-        <div style="font-size:13px; color:var(--text-muted); line-height:1.7;">
-          • 낮 기온 22도, 얇은 레이어드 추천<br>
-          • 가디건 챙기면 등원 때 딱 좋아요<br>
-          • 미세먼지 나쁨 - 실외 활동 짧게!
-        </div>
-      </div>
-    </div><!-- /home panel -->
-
-    <!-- ===== WARDROBE TAB ===== -->
-    <div class="tab-panel" id="panel-wardrobe">
-      <div class="top-header">
-        <div class="logo">옷장 👗</div>
-        <div class="header-right">
-          <button class="header-icon-btn" onclick="showToast('정렬 기능 준비중이에요!')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8FAB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Category Filters -->
-      <div class="category-filters" id="categoryFilters">
-        <button class="filter-pill active" data-cat="전체" onclick="filterWardrobe(this, '전체')">전체</button>
-        <button class="filter-pill" data-cat="상의" onclick="filterWardrobe(this, '상의')">상의</button>
-        <button class="filter-pill" data-cat="하의" onclick="filterWardrobe(this, '하의')">하의</button>
-        <button class="filter-pill" data-cat="원피스" onclick="filterWardrobe(this, '원피스')">원피스</button>
-        <button class="filter-pill" data-cat="아우터" onclick="filterWardrobe(this, '아우터')">아우터</button>
-        <button class="filter-pill" data-cat="신발" onclick="filterWardrobe(this, '신발')">신발</button>
-        <button class="filter-pill" data-cat="액세서리" onclick="filterWardrobe(this, '액세서리')">액세서리</button>
-      </div>
-
-      <!-- Wardrobe Grid -->
-      <div class="wardrobe-grid" id="wardrobeGrid"></div>
-    </div><!-- /wardrobe panel -->
-
-    <!-- ===== SIMULATION TAB ===== -->
-    <div class="tab-panel" id="panel-sim">
-      <div class="top-header">
-        <div class="logo">코디 시뮬레이션 ✨</div>
-      </div>
-
-      <!-- Weather banner -->
-      <div class="sim-weather-banner">
-        <svg width="20" height="20" viewBox="0 0 64 64" fill="none">
-          <circle cx="28" cy="26" r="10" fill="#FFD93D"/>
-          <rect x="16" y="36" width="32" height="8" rx="4" fill="#C8DFF0"/>
-          <rect x="12" y="42" width="30" height="8" rx="4" fill="#A8C8E8"/>
-        </svg>
-        오늘 서울 22°C · 구름 조금 — 가디건 레이어드 추천!
-      </div>
-
-      <!-- THE MAIN PHOTO -->
-      <div class="sim-photo-container" id="simPhotoContainer">
-        <!-- Shimmer overlay -->
-        <div class="shimmer-overlay" id="shimmerOverlay"></div>
-
-        <!-- Slot A (front) -->
-        <div class="sim-photo-slot" id="slotA">
-          <img id="imgA" src="" alt="코디 사진" onerror="handleImgError(this)">
-        </div>
-        <!-- Slot B (back) -->
-        <div class="sim-photo-slot" id="slotB">
-          <img id="imgB" src="" alt="코디 사진" onerror="handleImgError(this)">
+        <!-- 선택된 옷 칩 -->
+        <div class="sim-chips" id="simChips">
+          <div class="sim-empty">옷장에서 옷을 선택하면 여기에 표시됩니다</div>
         </div>
 
-        <!-- AI Badge -->
-        <div class="sim-ai-badge">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E8607A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-          </svg>
-          AI 코디 추천
+        <!-- 버튼 -->
+        <div class="sim-actions">
+          <button class="sim-btn primary" onclick="autoRecommend()">✨ 자동 추천</button>
+          <button class="sim-btn secondary" onclick="goTab('wardrobe')">👚 옷장 열기</button>
         </div>
 
-        <!-- Outfit name overlay -->
-        <div class="sim-outfit-name-overlay">
-          <div class="sim-outfit-name" id="simOutfitName">핑크 걸리시 코디</div>
-          <div class="sim-outfit-sub" id="simOutfitSub">봄 나들이 / 등원 추천</div>
+        <!-- 인플루언서 참고 -->
+        <div class="inf-section">
+          <div class="inf-title">📸 스타일 참고</div>
+          <div class="inf-scroll" id="infScroll"></div>
         </div>
+
       </div>
+    </div>
 
-      <!-- Selected chips -->
-      <div class="sim-chips-label">선택한 옷</div>
-      <div class="sim-chips" id="simChips">
-        <span style="color:var(--text-muted); font-size:13px; padding: 6px 0;">아래에서 옷을 선택하거나 "다시 추천"을 눌러보세요</span>
+    <!-- ── TAB 4: FEED ── -->
+    <div class="panel" id="tab-feed">
+      <div class="sec-header">
+        <div class="sec-title">✨ 스타일 피드</div>
+        <div class="sec-sub">인기 코디 모음</div>
       </div>
-
-      <!-- Action buttons -->
-      <div class="sim-actions">
-        <button class="sim-btn sim-btn-primary" onclick="shuffleOutfit()">
-          🔀 다시 추천
-        </button>
-        <button class="sim-btn sim-btn-outline" onclick="switchTab('wardrobe')">
-          👗 옷장에서 선택
-        </button>
+      <div class="filter-row" id="feed-filter-row">
+        <button class="filter-pill on" data-occ="전체" onclick="filterFeed(this)">전체</button>
+        <button class="filter-pill" data-occ="일상" onclick="filterFeed(this)">일상</button>
+        <button class="filter-pill" data-occ="등원" onclick="filterFeed(this)">등원</button>
+        <button class="filter-pill" data-occ="나들이" onclick="filterFeed(this)">나들이</button>
+        <button class="filter-pill" data-occ="파티" onclick="filterFeed(this)">파티</button>
       </div>
+      <div class="feed-grid" id="feed-grid"></div>
+    </div>
 
-      <!-- Influencer section -->
-      <div class="sim-influencer-section">
-        <div class="sim-influencer-title">인플루언서 참고 코디</div>
-        <div class="influencer-scroll" id="influencerScroll"></div>
-      </div>
-
-      <div style="height:20px;"></div>
-    </div><!-- /sim panel -->
-
-    <!-- ===== FEED TAB ===== -->
-    <div class="tab-panel" id="panel-feed">
-      <div class="top-header">
-        <div class="logo">스타일 피드 💕</div>
-        <div class="header-right">
-          <button class="header-icon-btn" onclick="showToast('검색 기능 준비중이에요!')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8FAB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="feed-filters" id="feedFilters">
-        <button class="filter-pill active" onclick="filterFeed(this, '전체')">전체</button>
-        <button class="filter-pill" onclick="filterFeed(this, '일상')">일상</button>
-        <button class="filter-pill" onclick="filterFeed(this, '등원')">등원</button>
-        <button class="filter-pill" onclick="filterFeed(this, '나들이')">나들이</button>
-        <button class="filter-pill" onclick="filterFeed(this, '파티')">파티</button>
-      </div>
-
-      <div class="feed-grid" id="feedGrid"></div>
-    </div><!-- /feed panel -->
-
-  </div><!-- /tab-content -->
+  </div><!-- /content -->
 
   <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
-      <div class="nav-icon nav-icon-bg">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF8FAB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-          <polyline points="9 22 9 12 15 12 15 22"/>
-        </svg>
-      </div>
-      <span class="nav-label">홈</span>
+  <nav class="nav">
+    <button class="nav-btn on" id="nav-home" onclick="goTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>홈</span>
     </button>
-    <button class="nav-item" id="nav-wardrobe" onclick="switchTab('wardrobe')">
-      <div class="nav-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CCC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/>
-        </svg>
-        <div class="nav-dot" id="wardrobeDot" style="display:none;"></div>
-      </div>
-      <span class="nav-label">옷장</span>
+    <button class="nav-btn" id="nav-wardrobe" onclick="goTab('wardrobe')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      <span>옷장</span>
     </button>
-    <button class="nav-item" id="nav-sim" onclick="switchTab('sim')">
-      <div class="nav-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CCC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="8" r="5"/><path d="M3 21v-1a8 8 0 0116 0v1"/>
-        </svg>
-      </div>
-      <span class="nav-label">코디</span>
+    <button class="nav-btn" id="nav-sim" onclick="goTab('sim')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+      <span>시뮬레이션</span>
     </button>
-    <button class="nav-item" id="nav-feed" onclick="switchTab('feed')">
-      <div class="nav-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CCC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-        </svg>
-      </div>
-      <span class="nav-label">피드</span>
+    <button class="nav-btn" id="nav-feed" onclick="goTab('feed')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>피드</span>
     </button>
   </nav>
 
-  <!-- Wardrobe FAB -->
-  <button class="fab" id="wardrobeFab" onclick="showToast('옷 추가 기능 준비중이에요! 📸')" style="display:none;">+</button>
-
-  <!-- Selection Bottom Bar -->
-  <div class="selection-bottom-bar" id="selectionBar">
-    <button class="selection-go-btn" onclick="goToSimFromWardrobe()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="8" r="5"/><path d="M3 21v-1a8 8 0 0116 0v1"/>
-      </svg>
-      <span id="selectionBarText">0개 선택됨 → 코디 시뮬레이션 보기</span>
-    </button>
+  <!-- SELECTION BAR (wardrobe) -->
+  <div class="select-bar hidden" id="selectBar">
+    <div class="select-bar-txt" id="selectBarTxt">0개 선택됨</div>
+    <button class="select-bar-btn" onclick="goSimFromWardrobe()">시뮬레이션 보기 →</button>
   </div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
-</div>
+  <!-- FAB -->
+  <button class="fab" id="fab" onclick="alert('사진 촬영 기능은 앱에서 지원됩니다.')">+</button>
+
+</div><!-- /app -->
 
 <script>
-/* =====================================================
-   DATA: OUTFIT SETS
-   Each set: { id, name, sub, photoId, itemIds }
-   The photo transitions when outfit changes.
-   ===================================================== */
-const OUTFIT_SETS = [
-  {
-    id: 'casual',
-    name: '캐주얼 데일리 코디',
-    sub: '일상 / 편안한 외출',
-    photoId: '1476234251651-f353703a034d',
-    itemIds: ['item-floral-skirt', 'item-stripe-tee', 'item-white-sneakers', 'item-ribbon']
-  },
-  {
-    id: 'pink-girly',
-    name: '핑크 걸리시 코디',
-    sub: '봄 나들이 / 등원 추천',
-    photoId: '1503454537195-1dcabb73ffb9',
-    itemIds: ['item-pink-dress', 'item-mary-jane', 'item-flower-clip']
-  },
-  {
-    id: 'denim-sporty',
-    name: '데님 스포티 코디',
-    sub: '활동적인 외출 / 놀이터',
-    photoId: '1515488042361-ee00e0ddd4e4',
-    itemIds: ['item-denim-pants', 'item-stripe-tee', 'item-white-sneakers']
-  },
-  {
-    id: 'floral-spring',
-    name: '플로럴 봄 코디',
-    sub: '봄 나들이 / 가족 나들이',
-    photoId: '1518717758536-85ae29035b6d',
-    itemIds: ['item-green-jumpsuit', 'item-flower-clip', 'item-mary-jane']
-  },
-  {
-    id: 'party-dressy',
-    name: '파티 드레시 코디',
-    sub: '생일파티 / 특별한 날',
-    photoId: '1519689680058-324335c6d2a5',
-    itemIds: ['item-party-dress', 'item-mary-jane', 'item-flower-clip']
-  },
-  {
-    id: 'cozy-layered',
-    name: '코지 레이어드 코디',
-    sub: '쌀쌀한 날 / 등원',
-    photoId: '1516627145497-ae6968895b74',
-    itemIds: ['item-cardigan', 'item-lace-blouse', 'item-denim-pants', 'item-ribbon']
-  },
-  {
-    id: 'summer-playful',
-    name: '여름 플레이풀 코디',
-    sub: '더운 날 / 여름 나들이',
-    photoId: '1555252333-9f8e92e65df9',
-    itemIds: ['item-green-jumpsuit', 'item-white-sneakers', 'item-ribbon']
-  },
-  {
-    id: 'smart-casual',
-    name: '스마트 캐주얼 코디',
-    sub: '세련된 일상 / 문화 활동',
-    photoId: '1476234251651-f353703a034d',
-    itemIds: ['item-lace-blouse', 'item-floral-skirt', 'item-mary-jane', 'item-flower-clip']
-  }
+/* ──────────────────────────────────────────────
+   DATA
+────────────────────────────────────────────── */
+
+// 카테고리 → 오버레이 존 매핑
+const CAT_TO_ZONE = {
+  '상의':     'top',
+  '하의':     'bottom',
+  '원피스':   'dress',
+  '아우터':   'outer',
+  '신발':     'shoes',
+  '액세서리': 'accessory'
+};
+
+// 옷장 데이터
+// photoId: Unsplash에서 실제 검색으로 수집한 ID
+const CLOTHES = [
+  { id:'c1', name:'핑크 플리츠 원피스', cat:'원피스', emoji:'👗',
+    photoId:'1622290291468-a28f7a7dc6a8', clean:true },
+  { id:'c2', name:'데님 팬츠', cat:'하의', emoji:'👖',
+    photoId:'1653835785932-1710eac6385d', clean:true },
+  { id:'c3', name:'흰 레이스 블라우스', cat:'상의', emoji:'👕',
+    photoId:'1664918688104-4eb8956f97a2', clean:true },
+  { id:'c4', name:'스트라이프 티셔츠', cat:'상의', emoji:'👕',
+    photoId:'1549069786-641f4cb652c7', clean:true },
+  { id:'c5', name:'플로럴 스커트', cat:'하의', emoji:'👗',
+    photoId:'1670014543471-3b5412baa677', clean:true },
+  { id:'c6', name:'레몬 점프수트', cat:'원피스', emoji:'🌻',
+    photoId:'1625132903377-2f57b75b8a85', clean:true },
+  { id:'c7', name:'파티 드레스', cat:'원피스', emoji:'✨',
+    photoId:'1528145203756-0ed7f01ee120', clean:false },
+  { id:'c8', name:'핑크 가디건', cat:'아우터', emoji:'🧶',
+    photoId:'1562383780-8486ec2b261e', clean:true },
+  { id:'c9', name:'화이트 운동화', cat:'신발', emoji:'👟',
+    photoId:'1630305130588-0e08d0d6965e', clean:true },
+  { id:'c10',name:'메리제인 구두', cat:'신발', emoji:'👡',
+    photoId:'1578178233034-33258dacb4c2', clean:true },
+  { id:'c11',name:'리본 헤어밴드', cat:'액세서리', emoji:'🎀',
+    photoId:'1734939205476-1039385aea9f', clean:true },
+  { id:'c12',name:'꽃무늬 모자', cat:'액세서리', emoji:'👒',
+    photoId:'1599152450785-aa6bfa58d85e', clean:true },
 ];
 
-/* =====================================================
-   DATA: CLOTHING ITEMS
-   ===================================================== */
-const CLOTHING_ITEMS = [
-  {
-    id: 'item-pink-dress',
-    name: '핑크 플리츠 원피스',
-    category: '원피스',
-    photoId: '1503454537195-1dcabb73ffb9',
-    emoji: '👗',
-    clean: true
-  },
-  {
-    id: 'item-denim-pants',
-    name: '데님 팬츠',
-    category: '하의',
-    photoId: '1542291026-7eec264c27ff',
-    emoji: '👖',
-    clean: true
-  },
-  {
-    id: 'item-lace-blouse',
-    name: '흰 레이스 블라우스',
-    category: '상의',
-    photoId: '1594938298603-37170c8be547',
-    emoji: '👚',
-    clean: true
-  },
-  {
-    id: 'item-stripe-tee',
-    name: '스트라이프 티셔츠',
-    category: '상의',
-    photoId: '1515488042361-ee00e0ddd4e4',
-    emoji: '👕',
-    clean: false
-  },
-  {
-    id: 'item-floral-skirt',
-    name: '플로럴 스커트',
-    category: '하의',
-    photoId: '1476234251651-f353703a034d',
-    emoji: '🌸',
-    clean: true
-  },
-  {
-    id: 'item-green-jumpsuit',
-    name: '연두 점프수트',
-    category: '원피스',
-    photoId: '1518717758536-85ae29035b6d',
-    emoji: '💚',
-    clean: true
-  },
-  {
-    id: 'item-party-dress',
-    name: '파티 드레스',
-    category: '원피스',
-    photoId: '1519689680058-324335c6d2a5',
-    emoji: '🎀',
-    clean: true
-  },
-  {
-    id: 'item-cardigan',
-    name: '니트 가디건',
-    category: '아우터',
-    photoId: '1516627145497-ae6968895b74',
-    emoji: '🧥',
-    clean: true
-  },
-  {
-    id: 'item-white-sneakers',
-    name: '운동화 (화이트)',
-    category: '신발',
-    photoId: '1555252333-9f8e92e65df9',
-    emoji: '👟',
-    clean: false
-  },
-  {
-    id: 'item-mary-jane',
-    name: '메리제인 슈즈',
-    category: '신발',
-    photoId: '1476234251651-f353703a034d',
-    emoji: '👞',
-    clean: true
-  },
-  {
-    id: 'item-ribbon',
-    name: '리본 헤어밴드',
-    category: '액세서리',
-    photoId: '1515488042361-ee00e0ddd4e4',
-    emoji: '🎀',
-    clean: true
-  },
-  {
-    id: 'item-flower-clip',
-    name: '꽃 클립 세트',
-    category: '액세서리',
-    photoId: '1518717758536-85ae29035b6d',
-    emoji: '🌼',
-    clean: true
-  }
+// 인플루언서 참고 사진 (실제 검색 ID)
+const INFLUENCERS = [
+  { name:'플로럴 봄 코디', tag:'나들이', photoId:'1758513422399-68a0aff34c8d' },
+  { name:'캐주얼 데일리', tag:'일상',   photoId:'1613248948503-74857459cd73' },
+  { name:'파티 드레스업', tag:'파티',   photoId:'1768625121007-817004c27c7b' },
+  { name:'등원 깔끔 룩',   tag:'등원',   photoId:'1659594219897-55702a3bd5de' },
 ];
 
-/* =====================================================
-   DATA: STYLE FEED
-   ===================================================== */
-const FEED_ITEMS = [
-  {
-    id: 'f1', tag: '나들이', title: '봄 플로럴 룩으로 공원 나들이', tag_cat: '나들이',
-    photoId: '1518717758536-85ae29035b6d', height: 180,
-    outfitSetId: 'floral-spring'
-  },
-  {
-    id: 'f2', tag: '파티', title: '생일파티 드레시 코디', tag_cat: '파티',
-    photoId: '1519689680058-324335c6d2a5', height: 220,
-    outfitSetId: 'party-dressy'
-  },
-  {
-    id: 'f3', tag: '일상', title: '편안한 데님 캐주얼 룩', tag_cat: '일상',
-    photoId: '1515488042361-ee00e0ddd4e4', height: 190,
-    outfitSetId: 'denim-sporty'
-  },
-  {
-    id: 'f4', tag: '등원', title: '핑크 원피스로 등원 완성!', tag_cat: '등원',
-    photoId: '1503454537195-1dcabb73ffb9', height: 200,
-    outfitSetId: 'pink-girly'
-  },
-  {
-    id: 'f5', tag: '나들이', title: '여름 점프수트 여행 코디', tag_cat: '나들이',
-    photoId: '1555252333-9f8e92e65df9', height: 210,
-    outfitSetId: 'summer-playful'
-  },
-  {
-    id: 'f6', tag: '일상', title: '레이어드 가디건 가을 코디', tag_cat: '일상',
-    photoId: '1516627145497-ae6968895b74', height: 175,
-    outfitSetId: 'cozy-layered'
-  },
-  {
-    id: 'f7', tag: '나들이', title: '스트라이프 캐주얼 데이 아웃', tag_cat: '나들이',
-    photoId: '1476234251651-f353703a034d', height: 195,
-    outfitSetId: 'casual'
-  },
-  {
-    id: 'f8', tag: '등원', title: '레이스 블라우스 스마트 등원룩', tag_cat: '등원',
-    photoId: '1594938298603-37170c8be547', height: 185,
-    outfitSetId: 'smart-casual'
-  }
+// 스타일 피드
+const FEED = [
+  { title:'핑크 봄 코디', tags:['나들이','봄'], occ:'나들이', photoId:'1536640712-4d4c36ff0e4e' },
+  { title:'캐주얼 등원룩', tags:['등원','편안함'], occ:'등원', photoId:'1609823056967-e56294bf6921' },
+  { title:'파티 드레스', tags:['파티','특별한날'], occ:'파티', photoId:'1770155468032-fe35d04b21f8' },
+  { title:'플로럴 원피스', tags:['일상','꽃무늬'], occ:'일상', photoId:'1758513422399-68a0aff34c8d' },
+  { title:'데님 캐주얼', tags:['일상','데님'], occ:'일상', photoId:'1613248948503-74857459cd73' },
+  { title:'생일파티 룩', tags:['파티','생일'], occ:'파티', photoId:'1768625121007-817004c27c7b' },
+  { title:'봄 나들이 룩', tags:['나들이','봄'], occ:'나들이', photoId:'1555895312-fc2610acaeb3' },
+  { title:'알록달록 일상', tags:['일상','컬러풀'], occ:'일상', photoId:'1584858820878-ca1d45fb15b6' },
 ];
 
-/* =====================================================
+/* ──────────────────────────────────────────────
    STATE
-   ===================================================== */
+────────────────────────────────────────────── */
+let selectedIds = new Set();
 let currentTab = 'home';
-let selectedItemIds = new Set();
-let cleanStates = {};         // itemId -> boolean
-let likedFeedItems = new Set();
-let currentOutfitSet = null;  // the currently displayed outfit set
-let currentSlot = 'A';        // which slot is visible
+let likedFeed = new Set();
+let currentCat = '전체';
 
-// init clean states from data
-CLOTHING_ITEMS.forEach(item => { cleanStates[item.id] = item.clean; });
-
-/* =====================================================
-   TAB SWITCHING
-   ===================================================== */
-function switchTab(tab) {
-  // hide all panels
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll('.nav-icon').forEach(n => n.classList.remove('nav-icon-bg'));
-
-  currentTab = tab;
-  document.getElementById('panel-' + (tab === 'wardrobe' ? 'wardrobe' : tab === 'sim' ? 'sim' : tab === 'feed' ? 'feed' : 'home')).classList.add('active');
-
-  const navEl = document.getElementById('nav-' + tab);
-  if (navEl) {
-    navEl.classList.add('active');
-    const iconEl = navEl.querySelector('.nav-icon');
-    if (iconEl) iconEl.classList.add('nav-icon-bg');
-    // update stroke colors
-    navEl.querySelectorAll('svg').forEach(svg => {
-      svg.querySelectorAll('[stroke]').forEach(el => { if (el.getAttribute('stroke') !== 'none') el.setAttribute('stroke', '#FF8FAB'); });
-    });
-  }
-
-  // reset other nav icons to grey
-  ['home','wardrobe','sim','feed'].forEach(t => {
-    if (t === tab) return;
-    const n = document.getElementById('nav-' + t);
-    if (n) {
-      n.querySelectorAll('svg').forEach(svg => {
-        svg.querySelectorAll('[stroke]').forEach(el => { if (el.getAttribute('stroke') !== 'none') el.setAttribute('stroke', '#CCC'); });
-      });
-    }
-  });
-
-  // Show/hide FAB for wardrobe
-  const fab = document.getElementById('wardrobeFab');
-  if (tab === 'wardrobe') {
-    fab.style.display = 'flex';
-  } else {
-    fab.style.display = 'none';
-  }
-
-  // scroll to top
-  document.querySelector('.tab-content').scrollTop = 0;
-}
-
-/* =====================================================
-   WARDROBE RENDERING
-   ===================================================== */
-function renderWardrobe(filterCat) {
-  const grid = document.getElementById('wardrobeGrid');
-  const items = filterCat === '전체' ? CLOTHING_ITEMS : CLOTHING_ITEMS.filter(i => i.category === filterCat);
-
-  if (items.length === 0) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="emoji">👗</div><div class="msg">해당 카테고리가 없어요</div><div class="sub">다른 카테고리를 선택해보세요</div></div>';
-    return;
-  }
-
-  grid.innerHTML = items.map(item => {
-    const isSelected = selectedItemIds.has(item.id);
-    const isClean = cleanStates[item.id];
-    return `
-      <div class="clothing-card ${isSelected ? 'selected' : ''}" id="card-${item.id}" onclick="toggleItemSelect('${item.id}')">
-        <div class="clothing-img-wrap">
-          <img
-            class="clothing-img"
-            src="https://images.unsplash.com/photo-${item.photoId}?w=200&h=200&fit=crop&q=80"
-            alt="${item.name}"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-            loading="lazy"
-          >
-          <div class="clothing-img-placeholder" style="display:none;">${item.emoji}</div>
-          <div class="check-overlay">
-            <div class="check-circle">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-            </div>
-          </div>
-          <div class="laundry-badge ${isClean ? 'clean' : 'dirty'}" id="badge-${item.id}">
-            ${isClean ? '✓ 깨끗' : '🧺 빨래'}
-          </div>
-          <button class="laundry-toggle" onclick="toggleLaundry(event, '${item.id}')" title="세탁 상태 변경">
-            ${isClean ? '✓' : '🧺'}
-          </button>
-        </div>
-        <div class="clothing-info">
-          <div class="clothing-name">${item.name}</div>
-          <span class="clothing-cat-badge">${item.category}</span>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function filterWardrobe(btn, cat) {
-  document.querySelectorAll('#categoryFilters .filter-pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  renderWardrobe(cat);
-}
-
-function toggleItemSelect(itemId) {
-  if (selectedItemIds.has(itemId)) {
-    selectedItemIds.delete(itemId);
-  } else {
-    selectedItemIds.add(itemId);
-  }
-  // Update card UI
-  const card = document.getElementById('card-' + itemId);
-  if (card) {
-    card.classList.toggle('selected', selectedItemIds.has(itemId));
-  }
-  updateSelectionBar();
-  // update dot on nav
-  document.getElementById('wardrobeDot').style.display = selectedItemIds.size > 0 ? 'block' : 'none';
-}
-
-function toggleLaundry(event, itemId) {
-  event.stopPropagation();
-  cleanStates[itemId] = !cleanStates[itemId];
-  // Re-render only that card's badges
-  const badge = document.getElementById('badge-' + itemId);
-  const toggle = document.querySelector(`#card-${itemId} .laundry-toggle`);
-  const isClean = cleanStates[itemId];
-  if (badge) {
-    badge.className = 'laundry-badge ' + (isClean ? 'clean' : 'dirty');
-    badge.innerHTML = isClean ? '✓ 깨끗' : '🧺 빨래';
-  }
-  if (toggle) toggle.textContent = isClean ? '✓' : '🧺';
-  showToast(isClean ? '깨끗한 옷으로 표시했어요 ✓' : '빨래 예정으로 표시했어요 🧺');
-}
-
-function updateSelectionBar() {
-  const bar = document.getElementById('selectionBar');
-  const text = document.getElementById('selectionBarText');
-  const fab = document.getElementById('wardrobeFab');
-  if (selectedItemIds.size > 0) {
-    bar.classList.add('visible');
-    text.textContent = `${selectedItemIds.size}개 선택됨 → 코디 시뮬레이션 보기`;
-    if (fab) fab.classList.add('pushed');
-  } else {
-    bar.classList.remove('visible');
-    if (fab) fab.classList.remove('pushed');
-  }
-}
-
-function goToSimFromWardrobe() {
-  switchTab('sim');
-  updateSimulation();
-}
-
-/* =====================================================
-   SIMULATION LOGIC (THE MAIN FEATURE)
-   ===================================================== */
-function unsplashUrl(photoId, w, h) {
+/* ──────────────────────────────────────────────
+   HELPERS
+────────────────────────────────────────────── */
+function uImg(photoId, w, h) {
   return `https://images.unsplash.com/photo-${photoId}?w=${w}&h=${h}&fit=crop&q=80`;
 }
 
-// Find best matching outfit set for the selected items
-function findBestOutfitSet(selectedIds) {
-  if (selectedIds.size === 0) {
-    // return random
-    return OUTFIT_SETS[Math.floor(Math.random() * OUTFIT_SETS.length)];
-  }
-
-  let bestSet = null;
-  let bestScore = -1;
-
-  OUTFIT_SETS.forEach(set => {
-    let score = 0;
-    selectedIds.forEach(id => {
-      if (set.itemIds.includes(id)) score++;
-    });
-    if (score > bestScore) {
-      bestScore = score;
-      bestSet = set;
-    }
-  });
-
-  return bestSet || OUTFIT_SETS[0];
+function imgTag(src, alt, cls, onerr) {
+  const errFn = onerr || `this.style.display='none'`;
+  return `<img src="${src}" alt="${alt}" class="${cls}" onerror="${errFn}" loading="lazy">`;
 }
 
-// Crossfade photo transition with shimmer
-function transitionToOutfit(outfitSet, isInitial) {
-  const shimmer = document.getElementById('shimmerOverlay');
-  const slotA = document.getElementById('slotA');
-  const slotB = document.getElementById('slotB');
-  const imgA = document.getElementById('imgA');
-  const imgB = document.getElementById('imgB');
-  const nameEl = document.getElementById('simOutfitName');
-  const subEl = document.getElementById('simOutfitSub');
+/* ──────────────────────────────────────────────
+   NAVIGATION
+────────────────────────────────────────────── */
+function goTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById('tab-' + tab).classList.add('on');
+  document.getElementById('nav-' + tab).classList.add('on');
+  currentTab = tab;
 
-  const newUrl = unsplashUrl(outfitSet.photoId, 380, 520);
-
-  if (isInitial) {
-    // No transition, just set
-    imgA.src = newUrl;
-    slotA.classList.remove('hidden');
-    slotB.classList.remove('visible');
-    currentSlot = 'A';
-    nameEl.textContent = outfitSet.name;
-    subEl.textContent = outfitSet.sub;
-    currentOutfitSet = outfitSet;
-    return;
+  // fab & selectBar visibility
+  const fab = document.getElementById('fab');
+  const sb  = document.getElementById('selectBar');
+  if (tab === 'wardrobe') {
+    fab.classList.remove('hidden');
+    updateSelectBar();
+  } else {
+    fab.classList.add('hidden');
+    sb.classList.add('hidden');
   }
 
-  // 1) Show shimmer for 500ms
-  shimmer.classList.add('active');
-
-  setTimeout(() => {
-    // 2) Load new image into the back slot
-    const backImg = currentSlot === 'A' ? imgB : imgA;
-    const frontSlot = currentSlot === 'A' ? slotA : slotB;
-    const backSlot = currentSlot === 'A' ? slotB : slotA;
-
-    backImg.src = newUrl;
-    backImg.onload = () => {
-      // 3) Hide shimmer, crossfade
-      shimmer.classList.remove('active');
-
-      // Bring back slot to front
-      if (currentSlot === 'A') {
-        slotA.classList.add('hidden');
-        slotB.classList.add('visible');
-        currentSlot = 'B';
-      } else {
-        slotB.classList.remove('visible');
-        slotA.classList.remove('hidden');
-        currentSlot = 'A';
-      }
-
-      nameEl.textContent = outfitSet.name;
-      subEl.textContent = outfitSet.sub;
-      currentOutfitSet = outfitSet;
-    };
-    backImg.onerror = () => {
-      shimmer.classList.remove('active');
-      handleImgError(backImg);
-    };
-  }, 500);
+  if (tab === 'sim') renderSimChips();
+  if (tab === 'feed') renderFeed();
+  if (tab === 'wardrobe') renderClothes();
 }
 
-function updateSimulation() {
-  const bestSet = findBestOutfitSet(selectedItemIds);
-  renderSimChips();
-  transitionToOutfit(bestSet, false);
+/* ──────────────────────────────────────────────
+   WARDROBE
+────────────────────────────────────────────── */
+function filterClothes(btn) {
+  document.querySelectorAll('#filter-row .filter-pill').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  currentCat = btn.dataset.cat;
+  renderClothes();
 }
 
-function renderSimChips() {
-  const container = document.getElementById('simChips');
-  if (selectedItemIds.size === 0) {
-    container.innerHTML = '<span style="color:var(--text-muted); font-size:13px; padding:6px 0;">옷을 선택하거나 "다시 추천"을 눌러보세요</span>';
-    return;
-  }
+function renderClothes() {
+  const list = currentCat === '전체'
+    ? CLOTHES
+    : CLOTHES.filter(c => c.cat === currentCat);
 
-  const chips = Array.from(selectedItemIds).map(id => {
-    const item = CLOTHING_ITEMS.find(c => c.id === id);
-    if (!item) return '';
+  const grid = document.getElementById('clothes-grid');
+  grid.innerHTML = list.map(c => {
+    const sel = selectedIds.has(c.id) ? 'selected' : '';
+    const dirty = c.clean ? '' : 'dirty';
+    const imgSrc = uImg(c.photoId, 300, 300);
     return `
-      <div class="outfit-chip" onclick="removeChip('${id}')">
-        ${item.emoji} ${item.name}
-        <div class="remove-x">✕</div>
+    <div class="cloth-card ${sel} ${dirty}" id="card-${c.id}" onclick="toggleSelect('${c.id}')">
+      <div class="cloth-img-wrap">
+        <img class="cloth-img"
+          src="${imgSrc}"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+          alt="${c.name}" loading="lazy">
+        <div class="cloth-img-placeholder" style="display:none">${c.emoji}</div>
       </div>
-    `;
-  }).join('');
-  container.innerHTML = chips;
-}
-
-function removeChip(itemId) {
-  selectedItemIds.delete(itemId);
-  // Update wardrobe card if visible
-  const card = document.getElementById('card-' + itemId);
-  if (card) card.classList.remove('selected');
-  updateSelectionBar();
-  document.getElementById('wardrobeDot').style.display = selectedItemIds.size > 0 ? 'block' : 'none';
-  renderSimChips();
-  // recalculate best set
-  const bestSet = findBestOutfitSet(selectedItemIds);
-  transitionToOutfit(bestSet, false);
-}
-
-function shuffleOutfit() {
-  // pick a random set different from current
-  let candidates = OUTFIT_SETS.filter(s => !currentOutfitSet || s.id !== currentOutfitSet.id);
-  if (candidates.length === 0) candidates = OUTFIT_SETS;
-  const next = candidates[Math.floor(Math.random() * candidates.length)];
-  // Also update selected items to match the new outfit
-  selectedItemIds.clear();
-  next.itemIds.forEach(id => selectedItemIds.add(id));
-  // update wardrobe cards if visible
-  document.querySelectorAll('.clothing-card').forEach(card => card.classList.remove('selected'));
-  Array.from(selectedItemIds).forEach(id => {
-    const card = document.getElementById('card-' + id);
-    if (card) card.classList.add('selected');
-  });
-  updateSelectionBar();
-  document.getElementById('wardrobeDot').style.display = selectedItemIds.size > 0 ? 'block' : 'none';
-  renderSimChips();
-  transitionToOutfit(next, false);
-}
-
-function handleImgError(img) {
-  const wrap = img.parentElement;
-  if (!wrap) return;
-  img.style.display = 'none';
-  let placeholder = wrap.querySelector('.photo-placeholder');
-  if (!placeholder) {
-    placeholder = document.createElement('div');
-    placeholder.className = 'photo-placeholder';
-    placeholder.innerHTML = '<span>👧</span><span>사진 없음</span>';
-    wrap.appendChild(placeholder);
-  }
-  placeholder.style.display = 'flex';
-}
-
-/* =====================================================
-   INFLUENCER CARDS
-   ===================================================== */
-function renderInfluencerCards() {
-  const scroll = document.getElementById('influencerScroll');
-  const infData = [
-    { name: '봄 플로럴 룩', photoId: '1518717758536-85ae29035b6d', outfitId: 'floral-spring' },
-    { name: '파티 드레스', photoId: '1519689680058-324335c6d2a5', outfitId: 'party-dressy' },
-    { name: '데님 스포티', photoId: '1515488042361-ee00e0ddd4e4', outfitId: 'denim-sporty' },
-    { name: '코지 레이어드', photoId: '1516627145497-ae6968895b74', outfitId: 'cozy-layered' },
-    { name: '핑크 걸리시', photoId: '1503454537195-1dcabb73ffb9', outfitId: 'pink-girly' },
-  ];
-  scroll.innerHTML = infData.map(inf => `
-    <div class="influencer-card" onclick="applyInfluencerOutfit('${inf.outfitId}')">
-      <img src="https://images.unsplash.com/photo-${inf.photoId}?w=220&h=260&fit=crop&q=80"
-           alt="${inf.name}"
-           loading="lazy"
-           onerror="this.style.display='none'">
-      <div class="inf-label">${inf.name}</div>
-    </div>
-  `).join('');
-}
-
-function applyInfluencerOutfit(outfitId) {
-  const set = OUTFIT_SETS.find(s => s.id === outfitId);
-  if (!set) return;
-  selectedItemIds.clear();
-  set.itemIds.forEach(id => selectedItemIds.add(id));
-  renderSimChips();
-  updateSelectionBar();
-  transitionToOutfit(set, false);
-  showToast(`"${set.name}" 코디를 적용했어요! ✨`);
-}
-
-/* =====================================================
-   STYLE FEED
-   ===================================================== */
-function renderFeed(filterCat) {
-  const grid = document.getElementById('feedGrid');
-  const items = filterCat === '전체' ? FEED_ITEMS : FEED_ITEMS.filter(f => f.tag_cat === filterCat);
-
-  if (items.length === 0) {
-    grid.innerHTML = '<div class="empty-state" style="column-span:all"><div class="emoji">🌸</div><div class="msg">해당 스타일이 없어요</div></div>';
-    return;
-  }
-
-  grid.innerHTML = items.map(item => {
-    const isLiked = likedFeedItems.has(item.id);
-    return `
-      <div class="feed-item" id="feed-${item.id}">
-        <button class="heart-btn ${isLiked ? 'liked' : ''}" onclick="toggleHeart(event, '${item.id}')">
-          ${isLiked ? '♥' : '♡'}
-        </button>
-        <img
-          src="https://images.unsplash.com/photo-${item.photoId}?w=300&h=${item.height}&fit=crop&q=80"
-          alt="${item.title}"
-          loading="lazy"
-          onerror="this.style.display='none'"
-        >
-        <div class="feed-item-info">
-          <span class="feed-item-tag">${item.tag}</span>
-          <div class="feed-item-title">${item.title}</div>
-          <button class="feed-item-apply" onclick="applyFeedOutfit('${item.outfitSetId}')">
-            내 아이에게 적용 →
+      <div class="cloth-info">
+        <div class="cloth-name">${c.name}</div>
+        <div class="cloth-meta">
+          <span class="cloth-cat">${c.cat}</span>
+          <button class="cloth-laundry" onclick="toggleLaundry(event,'${c.id}')" title="${c.clean?'세탁필요':'세탁완료'}">
+            ${c.clean ? '✅' : '🧺'}
           </button>
         </div>
       </div>
-    `;
+    </div>`;
   }).join('');
 }
 
-function filterFeed(btn, cat) {
-  document.querySelectorAll('#feedFilters .filter-pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  renderFeed(cat);
+function toggleSelect(id) {
+  if (selectedIds.has(id)) selectedIds.delete(id);
+  else selectedIds.add(id);
+  renderClothes();
+  updateSelectBar();
+  updateSimOverlays();
 }
 
-function toggleHeart(event, itemId) {
-  event.stopPropagation();
-  const btn = event.currentTarget;
-  if (likedFeedItems.has(itemId)) {
-    likedFeedItems.delete(itemId);
-    btn.classList.remove('liked');
-    btn.textContent = '♡';
-    showToast('저장 취소했어요');
+function toggleLaundry(e, id) {
+  e.stopPropagation();
+  const c = CLOTHES.find(x => x.id === id);
+  if (c) { c.clean = !c.clean; renderClothes(); updateStats(); }
+}
+
+function updateSelectBar() {
+  const sb = document.getElementById('selectBar');
+  const txt = document.getElementById('selectBarTxt');
+  if (selectedIds.size > 0) {
+    sb.classList.remove('hidden');
+    txt.textContent = `${selectedIds.size}개 선택됨`;
   } else {
-    likedFeedItems.add(itemId);
-    btn.classList.add('liked');
-    btn.textContent = '♥';
-    // heart bounce
-    btn.style.transform = 'scale(1.4)';
-    setTimeout(() => { btn.style.transform = ''; }, 200);
-    showToast('스타일 피드에 저장했어요 💕');
+    sb.classList.add('hidden');
   }
 }
 
-function applyFeedOutfit(outfitSetId) {
-  const set = OUTFIT_SETS.find(s => s.id === outfitSetId);
-  if (!set) return;
-  selectedItemIds.clear();
-  set.itemIds.forEach(id => selectedItemIds.add(id));
-  switchTab('sim');
+function goSimFromWardrobe() {
+  goTab('sim');
+  showShimmer(600);
+  setTimeout(updateSimOverlays, 200);
+}
+
+/* ──────────────────────────────────────────────
+   SIMULATION OVERLAYS
+   각 카테고리 옷이 아이 사진 위 해당 위치에 표시
+────────────────────────────────────────────── */
+function updateSimOverlays() {
+  // 모든 오버레이 숨기기
+  Object.values(CAT_TO_ZONE).forEach(zone => {
+    document.getElementById('ov-' + zone).classList.add('hidden');
+    document.getElementById('ov-' + zone).classList.remove('visible');
+  });
+
+  const selected = CLOTHES.filter(c => selectedIds.has(c.id));
+
+  // 카테고리별로 마지막 선택 항목 오버레이에 표시
+  const byZone = {};
+  selected.forEach(c => {
+    const zone = CAT_TO_ZONE[c.cat];
+    if (zone) byZone[zone] = c;
+  });
+
+  // 원피스 선택 시 상의/하의 오버레이 제거 (원피스가 전신 커버)
+  if (byZone['dress']) {
+    delete byZone['top'];
+    delete byZone['bottom'];
+  }
+
+  Object.entries(byZone).forEach(([zone, cloth]) => {
+    const ov = document.getElementById('ov-' + zone);
+    const img = document.getElementById('ov-' + zone + '-img');
+    if (ov && img) {
+      img.src = uImg(cloth.photoId, 200, 200);
+      img.alt = cloth.name;
+      ov.classList.remove('hidden');
+      ov.classList.add('visible');
+    }
+  });
+
+  // 라벨 업데이트
+  const label = document.getElementById('simOutfitName');
+  if (selected.length === 0) {
+    label.textContent = '옷을 선택해주세요';
+  } else {
+    label.textContent = selected.map(c => c.name).join(' + ');
+  }
+
   renderSimChips();
-  updateSelectionBar();
-  transitionToOutfit(set, false);
-  showToast(`"${set.name}" 코디를 적용했어요! 👗`);
 }
 
-/* =====================================================
-   TOAST
-   ===================================================== */
-let toastTimer = null;
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+function showShimmer(ms) {
+  const sh = document.getElementById('simShimmer');
+  sh.classList.add('on');
+  setTimeout(() => sh.classList.remove('on'), ms);
 }
 
-/* =====================================================
-   DATE/TIME
-   ===================================================== */
-function updateDateTime() {
-  const now = new Date();
-  const days = ['일','월','화','수','목','금','토'];
-  const el = document.getElementById('homeDateEl');
-  if (el) {
-    el.textContent = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일 (${days[now.getDay()]})`;
+function renderSimChips() {
+  const chips = document.getElementById('simChips');
+  const selected = CLOTHES.filter(c => selectedIds.has(c.id));
+  if (selected.length === 0) {
+    chips.innerHTML = '<div class="sim-empty">옷장에서 옷을 선택하면 여기에 표시됩니다</div>';
+    return;
+  }
+  chips.innerHTML = selected.map(c => `
+    <div class="sim-chip" onclick="removeItem('${c.id}')">
+      <img src="${uImg(c.photoId, 48, 48)}"
+           onerror="this.style.display='none'"
+           alt="${c.name}">
+      <span>${c.name}</span>
+      <span class="x">✕</span>
+    </div>`).join('');
+}
+
+function removeItem(id) {
+  selectedIds.delete(id);
+  updateSimOverlays();
+  renderSimChips();
+  updateSelectBar();
+  if (currentTab === 'wardrobe') renderClothes();
+}
+
+function autoRecommend() {
+  // 랜덤 코디 자동 선택
+  selectedIds.clear();
+  const cleanClothes = CLOTHES.filter(c => c.clean);
+  // 원피스 or 상의+하의 선택
+  const dresses = cleanClothes.filter(c => c.cat === '원피스');
+  const tops    = cleanClothes.filter(c => c.cat === '상의');
+  const bottoms = cleanClothes.filter(c => c.cat === '하의');
+  const shoes   = cleanClothes.filter(c => c.cat === '신발');
+  const accs    = cleanClothes.filter(c => c.cat === '액세서리');
+  const outers  = cleanClothes.filter(c => c.cat === '아우터');
+
+  const useDress = Math.random() > 0.4 && dresses.length > 0;
+  if (useDress) {
+    selectedIds.add(dresses[Math.floor(Math.random() * dresses.length)].id);
+  } else {
+    if (tops.length)    selectedIds.add(tops[Math.floor(Math.random() * tops.length)].id);
+    if (bottoms.length) selectedIds.add(bottoms[Math.floor(Math.random() * bottoms.length)].id);
+  }
+  if (shoes.length && Math.random() > 0.3)
+    selectedIds.add(shoes[Math.floor(Math.random() * shoes.length)].id);
+  if (accs.length && Math.random() > 0.5)
+    selectedIds.add(accs[Math.floor(Math.random() * accs.length)].id);
+  if (outers.length && Math.random() > 0.6)
+    selectedIds.add(outers[Math.floor(Math.random() * outers.length)].id);
+
+  showShimmer(800);
+  setTimeout(() => {
+    updateSimOverlays();
+    renderSimChips();
+  }, 400);
+}
+
+function handleChildImgErr() {
+  const img = document.getElementById('simChildImg');
+  // 대체 이미지 시도
+  const fallbacks = [
+    '1609823782420-098cc593b516',
+    '1759593218443-38dbd27056c6',
+    '1768509197002-6bac59ccddbb',
+  ];
+  const cur = img.dataset.fallbackIdx || 0;
+  if (cur < fallbacks.length) {
+    img.src = uImg(fallbacks[cur], 380, 570);
+    img.dataset.fallbackIdx = +cur + 1;
+  } else {
+    img.style.display = 'none';
+    const wrap = document.getElementById('simWrap');
+    wrap.style.background = 'linear-gradient(135deg, #FFD6E7, #E8E2FF)';
+    wrap.innerHTML += '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:100px;text-align:center">👧</div>';
   }
 }
 
-/* =====================================================
+/* ──────────────────────────────────────────────
+   INFLUENCERS
+────────────────────────────────────────────── */
+function renderInfluencers() {
+  const el = document.getElementById('infScroll');
+  if (!el) return;
+  el.innerHTML = INFLUENCERS.map(inf => `
+    <div class="inf-card">
+      <img src="${uImg(inf.photoId, 280, 360)}"
+           onerror="this.style.background='var(--pink3)';this.style.height='180px'"
+           alt="${inf.name}" loading="lazy">
+      <div class="inf-card-info">
+        <div class="inf-card-name">${inf.name}</div>
+        <div class="inf-card-tag">#${inf.tag}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ──────────────────────────────────────────────
+   FEED
+────────────────────────────────────────────── */
+function filterFeed(btn) {
+  document.querySelectorAll('#feed-filter-row .filter-pill').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderFeed(btn.dataset.occ);
+}
+
+function renderFeed(occ) {
+  const list = (!occ || occ === '전체') ? FEED : FEED.filter(f => f.occ === occ);
+  const grid = document.getElementById('feed-grid');
+  grid.innerHTML = list.map((f, i) => `
+    <div class="feed-card">
+      <img src="${uImg(f.photoId, 300, 400)}"
+           onerror="this.style.background='var(--pink3)';this.style.height='200px'"
+           alt="${f.title}" loading="lazy">
+      <button class="feed-heart ${likedFeed.has(i)?'liked':''}"
+              onclick="toggleLike(event,${i},this)">
+        ${likedFeed.has(i) ? '❤️' : '🤍'}
+      </button>
+      <div class="feed-card-info">
+        <div class="feed-card-title">${f.title}</div>
+        <div class="feed-card-tags">${f.tags.map(t=>`<span class="feed-tag">#${t}</span>`).join('')}</div>
+      </div>
+      <button class="feed-apply" onclick="applyFeedOutfit(${i})">내 아이에게 적용 →</button>
+    </div>`).join('');
+}
+
+function toggleLike(e, i, btn) {
+  e.stopPropagation();
+  if (likedFeed.has(i)) likedFeed.delete(i);
+  else likedFeed.add(i);
+  btn.textContent = likedFeed.has(i) ? '❤️' : '🤍';
+  btn.classList.toggle('liked', likedFeed.has(i));
+}
+
+function applyFeedOutfit(i) {
+  // 피드 아이템 적용 → 랜덤 코디 추천으로 이동
+  autoRecommend();
+  goTab('sim');
+}
+
+/* ──────────────────────────────────────────────
+   STATS
+────────────────────────────────────────────── */
+function updateStats() {
+  document.getElementById('stat-total').textContent = CLOTHES.length;
+  document.getElementById('stat-clean').textContent = CLOTHES.filter(c=>c.clean).length;
+}
+
+/* ──────────────────────────────────────────────
    INIT
-   ===================================================== */
-function init() {
-  updateDateTime();
+────────────────────────────────────────────── */
+window.onload = function() {
+  renderClothes();
+  renderInfluencers();
+  renderFeed();
+  updateStats();
 
-  // Render wardrobe
-  renderWardrobe('전체');
+  // 오늘 날짜
+  const d = new Date();
+  const days = ['일','월','화','수','목','금','토'];
+  document.getElementById('today-date').textContent =
+    `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${days[d.getDay()]}요일`;
 
-  // Initialize simulation with a random outfit
-  const randomOutfit = OUTFIT_SETS[Math.floor(Math.random() * OUTFIT_SETS.length)];
-  currentOutfitSet = randomOutfit;
-
-  // Pre-select items for initial outfit
-  randomOutfit.itemIds.forEach(id => selectedItemIds.add(id));
-
-  // Set initial photo (no transition, no shimmer)
-  const imgA = document.getElementById('imgA');
-  imgA.src = unsplashUrl(randomOutfit.photoId, 380, 520);
-  document.getElementById('simOutfitName').textContent = randomOutfit.name;
-  document.getElementById('simOutfitSub').textContent = randomOutfit.sub;
-
-  renderSimChips();
-  renderInfluencerCards();
-  renderFeed('전체');
-
-  // Set initial nav state
-  const homeNav = document.getElementById('nav-home');
-  if (homeNav) {
-    homeNav.querySelectorAll('svg').forEach(svg => {
-      svg.querySelectorAll('[stroke]').forEach(el => { if (el.getAttribute('stroke') !== 'none') el.setAttribute('stroke', '#FF8FAB'); });
-    });
-  }
-}
-
-document.addEventListener('DOMContentLoaded', init);
+  const h = d.getHours();
+  const greet = h < 12 ? '좋은 아침이에요!' : h < 17 ? '좋은 오후예요!' : '좋은 저녁이에요!';
+  document.getElementById('greeting').textContent = greet + ' 오늘도 예쁘게 입혀봐요 💕';
+};
 </script>
 </body>
 </html>
