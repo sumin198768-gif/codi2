@@ -510,16 +510,15 @@ function removeChip(id){
   if(document.getElementById('tab-wardrobe').classList.contains('on')) renderClothes();
 }
 
+const PROXY = 'https://codi2.vercel.app';
+
 async function runTryOn(){
   const items=CLOTHES.filter(c=>selected.has(c.id));
   if(!items.length){alert('먼저 옷장에서 옷을 선택해주세요!');return;}
   if(tryOnRunning) return;
 
   const token = localStorage.getItem('replicate_token');
-  if(!token){
-    openSettings();
-    return;
-  }
+  if(!token){ openSettings(); return; }
 
   tryOnRunning=true;
   document.getElementById('simPlaceholder').style.display='none';
@@ -527,49 +526,38 @@ async function runTryOn(){
   document.getElementById('simLoading').classList.add('on');
   document.getElementById('simBadge').style.display='none';
 
-  // 상의/원피스 우선, 없으면 첫 번째 아이템
   const mainItem = items.find(c=>c.cat==='원피스'||c.cat==='상의') || items[0];
   const personUrl = 'https://images.unsplash.com/photo-1609823056967-e56294bf6921?w=768&h=1024&fit=crop&q=90';
   const garmentUrl = U(mainItem.pid, 768, 768);
 
   try {
-    // 1. Replicate 예측 생성
-    const createRes = await fetch('https://api.replicate.com/v1/models/yisol/idm-vton/predictions', {
+    // 1. 프록시를 통해 예측 생성
+    const createRes = await fetch(`${PROXY}/api/predict`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        input: {
-          human_img: personUrl,
-          garm_img: garmentUrl,
-          garment_des: mainItem.desc || mainItem.name,
-          is_checked: true,
-          is_checked_crop: false,
-          denoise_steps: 30,
-          seed: 42
-        }
+        personImageUrl: personUrl,
+        garmentImageUrl: garmentUrl,
+        garmentDescription: mainItem.desc || mainItem.name,
+        token
       })
     });
 
     if(!createRes.ok){
       const err = await createRes.json();
-      throw new Error(err.detail || 'API 오류');
+      throw new Error(err.error || 'API 오류 '+createRes.status);
     }
 
-    const prediction = await createRes.json();
+    const { id } = await createRes.json();
 
-    // 2. 결과 폴링 (최대 120초)
+    // 2. 프록시를 통해 폴링 (최대 120초)
     let output = null;
     for(let i=0; i<40; i++){
       await new Promise(r=>setTimeout(r,3000));
-      const pollRes = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
-        headers: {'Authorization': `Bearer ${token}`}
-      });
+      const pollRes = await fetch(`${PROXY}/api/status?id=${id}&token=${encodeURIComponent(token)}`);
       const status = await pollRes.json();
       if(status.status==='succeeded'){ output=status.output; break; }
-      if(status.status==='failed') throw new Error('AI 처리 실패: '+status.error);
+      if(status.status==='failed') throw new Error('AI 처리 실패: '+(status.error||''));
     }
 
     document.getElementById('simLoading').classList.remove('on');
