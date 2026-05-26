@@ -166,6 +166,23 @@ body{display:flex;justify-content:center;min-height:100vh}
 .ref-card-name{font-size:11px;font-weight:600}
 .ref-card-tag{font-size:10px;color:var(--muted);margin-top:2px}
 
+/* ═══ SETTINGS MODAL ═══ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-bg.on{opacity:1;pointer-events:auto}
+.modal{width:min(390px,100%);background:#fff;border-radius:24px 24px 0 0;padding:28px 20px 36px;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,1,.45,1)}
+.modal-bg.on .modal{transform:translateY(0)}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.modal-input{width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:var(--r2);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.modal-input:focus{border-color:var(--pink)}
+.modal-btns{display:flex;gap:10px;margin-top:14px}
+.modal-btn{flex:1;padding:13px;border-radius:var(--r2);font-size:13px;font-weight:700;cursor:pointer;border:none}
+.modal-btn.save{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}
+.modal-btn.cancel{background:var(--pink3);color:var(--pink)}
+.token-status{margin-top:10px;font-size:12px;padding:8px 12px;border-radius:var(--r3);text-align:center}
+.token-status.ok{background:#e8f5e9;color:#2e7d32}
+.token-status.no{background:#fff3e0;color:#e65100}
+
 /* ═══ FEED ═══ */
 .feed-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 14px 14px}
 .fc{border-radius:var(--r);overflow:hidden;background:var(--card);box-shadow:var(--shadow);cursor:pointer;position:relative}
@@ -187,7 +204,7 @@ body{display:flex;justify-content:center;min-height:100vh}
     <div class="logo">코디<b>맘</b> 👗</div>
     <div class="hdr-actions">
       <button class="icon-btn">🔔</button>
-      <button class="icon-btn">⚙️</button>
+      <button class="icon-btn" onclick="openSettings()">⚙️</button>
     </div>
   </div>
 
@@ -350,6 +367,24 @@ body{display:flex;justify-content:center;min-height:100vh}
     </button>
   </nav>
 
+  <!-- SETTINGS MODAL -->
+  <div class="modal-bg" id="settingsModal" onclick="closeSettings(event)">
+    <div class="modal">
+      <div class="modal-title">🔑 AI 피팅 설정</div>
+      <div class="modal-sub">
+        Replicate API 키를 입력하면 실제 AI 가상 피팅이 작동해요.<br>
+        키는 이 기기에만 저장되며 외부로 전송되지 않아요.
+      </div>
+      <input class="modal-input" id="tokenInput" type="password"
+        placeholder="r8_xxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+      <div class="token-status no" id="tokenStatus">⚠️ API 키 미설정 — 데모 모드로 작동 중</div>
+      <div class="modal-btns">
+        <button class="modal-btn cancel" onclick="closeSettings()">취소</button>
+        <button class="modal-btn save" onclick="saveToken()">저장</button>
+      </div>
+    </div>
+  </div>
+
   <div class="sel-bar hidden" id="selBar">
     <div class="sel-bar-txt" id="selTxt">0개 선택됨</div>
     <button class="sel-bar-btn" onclick="goSimFromWardrobe()">AI 피팅 →</button>
@@ -480,49 +515,88 @@ async function runTryOn(){
   if(!items.length){alert('먼저 옷장에서 옷을 선택해주세요!');return;}
   if(tryOnRunning) return;
 
+  const token = localStorage.getItem('replicate_token');
+  if(!token){
+    openSettings();
+    return;
+  }
+
   tryOnRunning=true;
-  // 로딩 표시
   document.getElementById('simPlaceholder').style.display='none';
   document.getElementById('simResult').classList.remove('on');
   document.getElementById('simLoading').classList.add('on');
   document.getElementById('simBadge').style.display='none';
 
-  // 베이스 이미지 URL
-  const baseUrl = document.getElementById('simBase').src;
-  // 선택된 첫 번째 옷 이미지 URL (주요 아이템)
-  const mainItem = items[0];
-  const garmentUrl = U(mainItem.pid, 400, 400);
+  // 상의/원피스 우선, 없으면 첫 번째 아이템
+  const mainItem = items.find(c=>c.cat==='원피스'||c.cat==='상의') || items[0];
+  const personUrl = 'https://images.unsplash.com/photo-1609823056967-e56294bf6921?w=768&h=1024&fit=crop&q=90';
+  const garmentUrl = U(mainItem.pid, 768, 768);
 
   try {
-    const res = await fetch('/api/tryon', {
+    // 1. Replicate 예측 생성
+    const createRes = await fetch('https://api.replicate.com/v1/models/yisol/idm-vton/predictions', {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        personImageUrl: baseUrl,
-        garmentImageUrl: garmentUrl,
-        garmentDescription: mainItem.desc
+        input: {
+          human_img: personUrl,
+          garm_img: garmentUrl,
+          garment_des: mainItem.desc || mainItem.name,
+          is_checked: true,
+          is_checked_crop: false,
+          denoise_steps: 30,
+          seed: 42
+        }
       })
     });
-    const data = await res.json();
+
+    if(!createRes.ok){
+      const err = await createRes.json();
+      throw new Error(err.detail || 'API 오류');
+    }
+
+    const prediction = await createRes.json();
+
+    // 2. 결과 폴링 (최대 120초)
+    let output = null;
+    for(let i=0; i<40; i++){
+      await new Promise(r=>setTimeout(r,3000));
+      const pollRes = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
+        headers: {'Authorization': `Bearer ${token}`}
+      });
+      const status = await pollRes.json();
+      if(status.status==='succeeded'){ output=status.output; break; }
+      if(status.status==='failed') throw new Error('AI 처리 실패: '+status.error);
+    }
 
     document.getElementById('simLoading').classList.remove('on');
 
-    if(data.success && data.resultUrl){
-      // AI 결과 표시
-      const img=document.getElementById('simResultImg');
-      img.src=data.resultUrl;
-      img.onload=()=>{
+    if(output){
+      const resultUrl = Array.isArray(output) ? output[0] : output;
+      const img = document.getElementById('simResultImg');
+      img.src = resultUrl;
+      img.onload = ()=>{
         document.getElementById('simResult').classList.add('on');
         document.getElementById('simBadge').style.display='block';
+        document.getElementById('simBadge').textContent='✨ AI 가상 피팅 완료';
       };
     } else {
-      // 데모 모드: 유사한 사진으로 전환
+      throw new Error('결과를 받지 못했습니다.');
+    }
+
+  } catch(err){
+    document.getElementById('simLoading').classList.remove('on');
+    console.error(err);
+    if(err.message.includes('401')||err.message.includes('Unauthorized')){
+      alert('API 키가 올바르지 않아요. 설정에서 다시 확인해주세요.');
+      openSettings();
+    } else {
+      alert('AI 처리 중 오류: '+err.message+'\n\n데모 모드로 전환합니다.');
       demoFallback(items);
     }
-  } catch(err) {
-    // API 미연결 → 데모 모드
-    document.getElementById('simLoading').classList.remove('on');
-    demoFallback(items);
   }
   tryOnRunning=false;
 }
@@ -618,6 +692,40 @@ function toggleLike(e,i,btn){
 }
 function applyFeed(i){ autoSelect(); goTab('sim'); }
 
+/* ── SETTINGS ── */
+function openSettings(){
+  const modal=document.getElementById('settingsModal');
+  const input=document.getElementById('tokenInput');
+  const stored=localStorage.getItem('replicate_token')||'';
+  input.value=stored;
+  updateTokenStatus(!!stored);
+  modal.classList.add('on');
+}
+function closeSettings(e){
+  if(e && e.target!==document.getElementById('settingsModal')) return;
+  document.getElementById('settingsModal').classList.remove('on');
+}
+function saveToken(){
+  const val=document.getElementById('tokenInput').value.trim();
+  if(val && !val.startsWith('r8_')){
+    alert('올바른 Replicate API 키를 입력해주세요. (r8_로 시작)');
+    return;
+  }
+  localStorage.setItem('replicate_token', val);
+  updateTokenStatus(!!val);
+  document.getElementById('settingsModal').classList.remove('on');
+  if(val){
+    document.getElementById('apiNotice').style.display='none';
+  } else {
+    document.getElementById('apiNotice').style.display='block';
+  }
+}
+function updateTokenStatus(hasToken){
+  const el=document.getElementById('tokenStatus');
+  el.className='token-status '+(hasToken?'ok':'no');
+  el.textContent=hasToken?'✅ API 키 저장됨 — AI 피팅 사용 가능':'⚠️ API 키 미설정 — 데모 모드로 작동 중';
+}
+
 /* ── STATS ── */
 function updateStats(){
   document.getElementById('s-total').textContent=CLOTHES.length;
@@ -627,6 +735,11 @@ function updateStats(){
 /* ── INIT ── */
 window.onload=()=>{
   renderClothes(); renderRefs(); renderFeed(); updateStats();
+  // 저장된 토큰 확인
+  const token=localStorage.getItem('replicate_token');
+  if(token){
+    document.getElementById('apiNotice').style.display='none';
+  }
   const d=new Date();
   const days=['일','월','화','수','목','금','토'];
   document.getElementById('banner-date').textContent=
