@@ -517,21 +517,21 @@ async function runTryOn(){
   if(!items.length){alert('먼저 옷장에서 옷을 선택해주세요!');return;}
   if(tryOnRunning) return;
 
-  const token = localStorage.getItem('replicate_token');
-  if(!token){ openSettings(); return; }
-
   tryOnRunning=true;
   document.getElementById('simPlaceholder').style.display='none';
   document.getElementById('simResult').classList.remove('on');
   document.getElementById('simLoading').classList.add('on');
   document.getElementById('simBadge').style.display='none';
 
+  const token = localStorage.getItem('replicate_token');
+  const hfToken = localStorage.getItem('hf_token');
+
   const mainItem = items.find(c=>c.cat==='원피스'||c.cat==='상의') || items[0];
   const personUrl = 'https://images.unsplash.com/photo-1609823056967-e56294bf6921?w=768&h=1024&fit=crop&q=90';
   const garmentUrl = U(mainItem.pid, 768, 768);
 
   try {
-    // 1. 프록시를 통해 예측 생성
+    // 1. 예측 생성 (토큰 있으면 Replicate, 없으면 HF Space 무료)
     const createRes = await fetch(`${PROXY}/api/predict`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -539,7 +539,8 @@ async function runTryOn(){
         personImageUrl: personUrl,
         garmentImageUrl: garmentUrl,
         garmentDescription: mainItem.desc || mainItem.name,
-        token
+        ...(token ? { token } : {}),
+        ...(hfToken ? { hfToken } : {})
       })
     });
 
@@ -548,13 +549,23 @@ async function runTryOn(){
       throw new Error(err.error || 'API 오류 '+createRes.status);
     }
 
-    const { id } = await createRes.json();
+    const pred = await createRes.json();
+    const { id, provider } = pred;
 
-    // 2. 프록시를 통해 폴링 (최대 120초)
+    if(provider==='hf'){
+      const queueMsg = document.getElementById('simLoadingMsg');
+      if(queueMsg) queueMsg.textContent = '무료 AI 처리 중... (1-3분 소요)';
+    }
+
+    // 2. 폴링 (최대 180초)
     let output = null;
-    for(let i=0; i<40; i++){
+    for(let i=0; i<60; i++){
       await new Promise(r=>setTimeout(r,3000));
-      const pollRes = await fetch(`${PROXY}/api/status?id=${id}&token=${encodeURIComponent(token)}`);
+      let pollUrl = `${PROXY}/api/status?id=${encodeURIComponent(id)}&provider=${provider||'replicate'}`;
+      if(token) pollUrl += `&token=${encodeURIComponent(token)}`;
+      if(hfToken) pollUrl += `&hfToken=${encodeURIComponent(hfToken)}`;
+
+      const pollRes = await fetch(pollUrl);
       const status = await pollRes.json();
       if(status.status==='succeeded'){ output=status.output; break; }
       if(status.status==='failed') throw new Error('AI 처리 실패: '+(status.error||''));
